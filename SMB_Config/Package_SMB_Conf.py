@@ -1,7 +1,5 @@
 import os
-#
-# Copyright (c) 2024 Tanium
-# TAM Content Laurent Chappe
+
 
 file_source = "//etc//samba//smb.conf"
 #file_source = "smb.conf"
