@@ -19,4 +19,4 @@ try:
 except:
     import traceback
     print(traceback.format_exc())
-    tanium.results.add(traceback.format_exc())
+    #tanium.results.add(traceback.format_exc())
