@@ -1,52 +1,52 @@
-# Get logged-in users (interactive sessions only)
-$LoggedOnUsers = Get-CimInstance Win32_LoggedOnUser |
-    ForEach-Object {
-        ($_ | Select-Object -ExpandProperty Antecedent) -match 'Domain="(.+)",Name="(.+)"' | Out-Null
-        [PSCustomObject]@{
-            Domain = $Matches[1]
-            User   = $Matches[2]
+$PINNED = 0x00080000
+$OFFLINE = 0x00001000
+
+$results = @()
+
+Get-ChildItem "C:\Users" -Directory -ErrorAction SilentlyContinue | ForEach-Object {
+    $userName = $_.Name
+    $profilePath = $_.FullName
+
+    $oneDriveFolders = Get-ChildItem $profilePath -Directory -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -like "OneDrive*" }
+
+    foreach ($folder in $oneDriveFolders) {
+        $locallyAvailable = 0
+        $onlineOnly = 0
+        $alwaysAvailable = 0
+
+        try {
+            Get-ChildItem $folder.FullName -Recurse -File -Force -ErrorAction SilentlyContinue | ForEach-Object {
+                $size = if ($_.Length) { [int64]$_.Length } else { 0 }
+                $attrs = [int64]$_.Attributes
+
+                if (($attrs -band $PINNED) -ne 0) {
+                    $alwaysAvailable += $size
+                }
+                elseif (($attrs -band $OFFLINE) -ne 0) {
+                    $onlineOnly += $size
+                }
+                else {
+                    $locallyAvailable += $size
+                }
+            }
+
+            $results += "{0}|{1}|{2}|{3}|{4}" -f `
+                $userName, `
+                $folder.FullName, `
+                ([math]::Round($locallyAvailable / 1GB, 2)), `
+                ([math]::Round($onlineOnly / 1GB, 2)), `
+                ([math]::Round($alwaysAvailable / 1GB, 2))
         }
-    } | Sort-Object User -Unique
-
-$Results = @()
-
-foreach ($User in $LoggedOnUsers) {
-
-    try {
-        # Get SID
-        $Account = New-Object System.Security.Principal.NTAccount($User.Domain, $User.User)
-        $SID = $Account.Translate([System.Security.Principal.SecurityIdentifier]).Value
-
-        # Registry path for user OneDrive config
-        $RegPath = "Registry::HKEY_USERS\$SID\Software\Microsoft\OneDrive"
-
-        # Try to get OneDrive folder
-        $OneDrivePath = (Get-ItemProperty -Path $RegPath -ErrorAction Stop).UserFolder
-
-        if (-not (Test-Path $OneDrivePath)) {
-            throw "Path not found"
-        }
-
-        # Calculate folder size
-        $SizeBytes = (Get-ChildItem -Path $OneDrivePath -Recurse -ErrorAction SilentlyContinue |
-            Measure-Object -Property Length -Sum).Sum
-
-        $SizeGB = [math]::Round($SizeBytes / 1GB, 2)
-
-        $Results += [PSCustomObject]@{
-            User          = "$($User.Domain)\$($User.User)"
-            OneDrivePath  = $OneDrivePath
-            SizeGB        = $SizeGB
-        }
-    }
-    catch {
-        $Results += [PSCustomObject]@{
-            User          = "$($User.Domain)\$($User.User)"
-            OneDrivePath  = "Not found / Not configured"
-            SizeGB        = 0
+        catch {
+            $results += "{0}|{1}|Error|Error|Error" -f $userName, $folder.FullName
         }
     }
 }
 
-# Output results
-$Results | Format-Table -AutoSize
+if ($results.Count -eq 0) {
+    Write-Output "No OneDrive folders found"
+}
+else {
+    $results
+}
