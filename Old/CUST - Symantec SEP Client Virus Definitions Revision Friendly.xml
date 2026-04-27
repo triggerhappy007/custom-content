@@ -1,0 +1,345 @@
+<!-- Exported using version "7_4_3_1242" on Wednesday, October 14, 2020 7:47:43 AM -->
+<content>
+    <sensor>
+        <name>CUST - Symantec SEP Client Virus Definitions Revision Friendly</name>
+        <what_hash>3212949893</what_hash>
+        <category>Symantec</category>
+        <description>Custom SEP sensor to make definition format more user friendly.</description>
+        <result_type>1</result_type>
+        <qseconds>900</qseconds>
+        <ignore_case_flag>1</ignore_case_flag>
+        <delimiter>|</delimiter>
+        <hidden_flag>0</hidden_flag>
+        <queries>
+            <sensor_query>
+                <sensor_type>4</sensor_type>
+                <os>0</os>
+                <query>&#x27;====================================
+&#x27; Symantec Endpoint Protection
+&#x27;
+&#x27; Get Client&#x27;s Virus Defs Revision
+&#x27;====================================
+
+&#x27;@INCLUDE=lib&#x2F;symantec&#x2F;IsSepInstalled.vbs
+&#x27;@INCLUDE=lib&#x2F;symantec&#x2F;GetSepVersion.vbs
+&#x27;@INCLUDE=lib&#x2F;symantec&#x2F;GetOsArchitecture.vbs
+&#x27;@INCLUDE=lib&#x2F;symantec&#x2F;GetRegistryProvider.vbs
+
+Option Explicit
+
+WScript.Echo GetAvDefsRev
+
+Function GetAvDefsRev
+	If IsSepInstalled = &quot;False&quot; Then
+		WScript.Echo &quot;Not Installed&quot;
+		WScript.Quit
+	End If
+	If Left(GetSepVersion, 4) = &quot;11.0&quot; Then
+		WScript.Echo &quot;Not Supported&quot;
+		WScript.Quit
+	End If
+	Const HKLM = &amp;H80000002
+  Dim strPath, dtmVirusDefsDate, dtmVirusDefsRev, intVirusDefsRev, RevDate, objReg : Set objReg = GetRegistryProvider
+	If GetOsArchitecture = &quot;x64-based PC&quot; Then
+		strPath = &quot;SOFTWARE\Wow6432Node\Symantec\Symantec Endpoint Protection\CurrentVersion\public-opstate&quot;
+	Else
+		strPath = &quot;SOFTWARE\Symantec\Symantec Endpoint Protection\CurrentVersion\public-opstate&quot;
+	End If
+	objReg.GetStringValue HKLM, strPath, &quot;LatestVirusDefsDate&quot;, dtmVirusDefsDate
+	objReg.GetDwordValue HKLM, strPath, &quot;LatestVirusDefsRevision&quot;, dtmVirusDefsRev
+	If Len(dtmVirusDefsRev) = 1 Then
+		intVirusDefsRev = Right(&quot;00&quot; &amp; dtmVirusDefsRev, 3)
+	ElseIf Len(dtmVirusDefsRev) = 2 Then
+		intVirusDefsRev = Right(&quot;0&quot; &amp; dtmVirusDefsRev, 3)
+	Else
+		intVirusDefsRev = dtmVirusDefsRev
+	End If
+  
+  
+  RevDate=split(dtmVirusDefsDate,&quot;-&quot;)
+  
+  GetAvDefsRev = Replace(dtmVirusDefsDate, &quot;-&quot;, &quot;&quot;, 1, -1, 1) &amp; &quot;|&quot; &amp; intVirusDefsRev &amp; &quot;|&quot; &amp; RevDate(2)+&quot;&#x2F;&quot;+RevDate(1)+&quot;&#x2F;&quot;+RevDate(0) &amp; &quot;|&quot; &amp; DateDiff(&quot;d&quot;,RevDate(2)+&quot;&#x2F;&quot;+RevDate(1)+&quot;&#x2F;&quot;+RevDate(0),Date)
+  
+  &#x27;GetAvDefsRev = Replace(dtmVirusDefsDate, &quot;-&quot;, &quot;&quot;, 1, -1, 1) &amp; &quot;|&quot; &amp; DateDiff(&quot;d&quot;,dtmVirusDefsDate,year(now)*100+month(now)*100+day(now))
+End Function &#x27;GetAvDefsRev
+&#x27;------------ INCLUDES after this line. Do not edit past this point -----
+&#x27;- Begin file: lib&#x2F;symantec&#x2F;IsSepInstalled.vbs
+&#x27; Returns True or False if SEP is installed
+
+Function IsSepInstalled
+	Dim colItems : Set colItems = GetObject(&quot;winmgmts:\\.\root\cimv2&quot;).ExecQuery(&quot;Select Status from Win32_Service where Name = &#x27;SepMasterService&#x27; or Name = &#x27;Symantec AntiVirus&#x27;&quot;)
+	If colItems.Count = 0 Then
+		IsSepInstalled = &quot;False&quot;
+	Else
+		IsSepInstalled = &quot;True&quot;
+	End If
+	Set colItems = Nothing
+End Function &#x27;IsSepInstalled
+&#x27;- End file: lib&#x2F;symantec&#x2F;IsSepInstalled.vbs
+&#x27;- Begin file: lib&#x2F;symantec&#x2F;GetSepVersion.vbs
+&#x27;Returns the version of SEP client installed.
+
+
+
+Function GetSepVersion
+	Const HKLM = &amp;H80000002
+	Dim strVersion, strPath, objReg : Set objReg = GetRegistryProvider
+	If GetOsArchitecture = &quot;x64-based PC&quot; Then
+		strPath = &quot;SOFTWARE\WOW6432Node\Symantec\Symantec Endpoint Protection\CurrentVersion&quot;
+	Else
+		strPath = &quot;SOFTWARE\Symantec\Symantec Endpoint Protection\CurrentVersion&quot;
+	End If
+	objReg.GetStringValue HKLM, strPath, &quot;PRODUCTVERSION&quot;, strVersion
+	GetSepVersion = strVersion
+	Set objReg = Nothing
+End Function &#x27;GetSepVersion
+&#x27;- End file: lib&#x2F;symantec&#x2F;GetSepVersion.vbs
+&#x27;- Begin file: lib&#x2F;symantec&#x2F;GetOsArchitecture.vbs
+&#x27; Returns the architecture of the OS
+&#x27; &quot;x64-based PC&quot; or &quot;x86-based PC&quot;
+
+Function GetOsArchitecture
+	Dim objItem, colItems : Set colItems = GetObject(&quot;winmgmts:\\.\root\cimv2&quot;).ExecQuery(&quot;Select SystemType from Win32_ComputerSystem&quot;)
+	For Each objItem In colItems
+		GetOsArchitecture = objItem.SystemType
+	Next
+	Set colItems = Nothing
+End Function
+&#x27;- End file: lib&#x2F;symantec&#x2F;GetOsArchitecture.vbs
+&#x27;- Begin file: lib&#x2F;symantec&#x2F;GetRegistryProvider.vbs
+
+Function GetRegistryProvider
+    Dim intArch, objCtx, objLocator, objServices, objRegProv
+    If GetOsArchitecture = &quot;x64-based PC&quot; Then
+    	intArch = 64
+    Else
+		intArch = 32
+    End If
+    Set objCtx = CreateObject(&quot;WbemScripting.SWbemNamedValueSet&quot;)
+    objCtx.Add &quot;__ProviderArchitecture&quot;, intArch
+    Set objLocator = CreateObject(&quot;Wbemscripting.SWbemLocator&quot;)
+    Set objServices = objLocator.ConnectServer(&quot;&quot;,&quot;root\default&quot;,&quot;&quot;,&quot;&quot;,,,,objCtx)
+    Set objRegProv = objServices.Get(&quot;StdRegProv&quot;)
+    Set GetRegistryProvider = objRegProv
+    Set objCtx = Nothing
+    Set objLocator = Nothing
+End Function &#x27;GetRegistryProvider
+&#x27;- End file: lib&#x2F;symantec&#x2F;GetRegistryProvider.vbs</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>6</sensor_type>
+                <os>1</os>
+                <query>#!&#x2F;bin&#x2F;sh
+# -*- coding: utf-8 -*-
+&quot;exec&quot; &quot;env&quot; &quot;TANIUM_SENSOR=1&quot; &quot;`pwd`&#x2F;python27&#x2F;python&quot; &quot;$0&quot; &quot;$@&quot;
+
+from __future__ import print_function, unicode_literals
+import sys
+import os
+import traceback
+try:
+    import tanium
+except ImportError as e:
+	emsg = &#x27;Error locating necessary files. Ensure IC-Python is imported and deployed.&#x27;
+	sys.exit(emsg)
+
+__author__ = &#x27;Tanium&#x27;
+__content_name__ = &#x27;SEP Client Virus Definition Revision&#x27;
+__version__ = &#x27;1.0.1.0000&#x27;
+
+
+def get_platform():
+    return sys.platform
+
+
+def mac_sep_avdefrev():
+    fAvDefInfo = &quot;&#x2F;Library&#x2F;Application Support&#x2F;Symantec&#x2F;Silo&#x2F;NFM&#x2F;Definitions&#x2F;virusdefs&#x2F;definfo.dat&quot;
+    if os.path.exists(fAvDefInfo):
+        fAvDat = open(fAvDefInfo, &quot;r&quot;)
+        for line in fAvDat.readlines():
+            if &quot;CurDefs=&quot; in line:
+                sAvDefRev = line.rpartition(&#x27;=&#x27;)[-1].rstrip(&#x27;\n&#x27;)
+                return sAvDefRev
+                fAvDat.close()
+                break
+    else:
+        return &quot;Not Installed&quot;
+
+
+def linux_sep_avdefrev():
+    fAvDefInfo = &quot;&#x2F;opt&#x2F;Symantec&#x2F;virusdefs&#x2F;definfo.dat&quot;
+    if os.path.exists(fAvDefInfo):
+        fAvDat = open(fAvDefInfo, &quot;r&quot;)
+        for line in fAvDat.readlines():
+            if &quot;CurDefs=&quot; in line:
+                sAvDefRev = line.rpartition(&#x27;=&#x27;)[-1].rstrip(&#x27;\n&#x27;)
+                return sAvDefRev
+                fAvDat.close()
+                break
+    else:
+        return &quot;Not Installed&quot;
+
+
+def sensor_main():
+    if get_platform() == &#x27;darwin&#x27;:
+        return mac_sep_avdefrev()
+    elif get_platform().startswith(&#x27;linux&#x27;):
+        return linux_sep_avdefrev()
+    else:
+        return &quot;Unsupported platform&quot;
+
+
+if __name__ == &#x27;__main__&#x27;:
+    try:
+        r = sensor_main()
+    except Exception as e:
+        r = traceback.format_exc().replace(&#x27;\n&#x27;, &#x27;-&gt;&#x27;)
+    try:
+        tanium.results.add(r)
+    except (AttributeError, NameError):
+        print(r)
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>8</sensor_type>
+                <os>2</os>
+                <query>from __future__ import print_function, unicode_literals
+import sys
+import os
+import traceback
+try:
+    import tanium
+except ImportError as e:
+	emsg = &#x27;Error locating necessary files. Ensure IC-Python is imported and deployed.&#x27;
+	sys.exit(emsg)
+
+__author__ = &#x27;Tanium&#x27;
+__content_name__ = &#x27;SEP Client Virus Definition Revision&#x27;
+__version__ = &#x27;1.0.1.0000&#x27;
+
+
+def get_platform():
+    return sys.platform
+
+
+def mac_sep_avdefrev():
+    fAvDefInfo = &quot;&#x2F;Library&#x2F;Application Support&#x2F;Symantec&#x2F;Silo&#x2F;NFM&#x2F;Definitions&#x2F;virusdefs&#x2F;definfo.dat&quot;
+    if os.path.exists(fAvDefInfo):
+        fAvDat = open(fAvDefInfo, &quot;r&quot;)
+        for line in fAvDat.readlines():
+            if &quot;CurDefs=&quot; in line:
+                sAvDefRev = line.rpartition(&#x27;=&#x27;)[-1].rstrip(&#x27;\n&#x27;)
+                return sAvDefRev
+                fAvDat.close()
+                break
+    else:
+        return &quot;Not Installed&quot;
+
+
+def linux_sep_avdefrev():
+    fAvDefInfo = &quot;&#x2F;opt&#x2F;Symantec&#x2F;virusdefs&#x2F;definfo.dat&quot;
+    if os.path.exists(fAvDefInfo):
+        fAvDat = open(fAvDefInfo, &quot;r&quot;)
+        for line in fAvDat.readlines():
+            if &quot;CurDefs=&quot; in line:
+                sAvDefRev = line.rpartition(&#x27;=&#x27;)[-1].rstrip(&#x27;\n&#x27;)
+                return sAvDefRev
+                fAvDat.close()
+                break
+    else:
+        return &quot;Not Installed&quot;
+
+
+def sensor_main():
+    if get_platform() == &#x27;darwin&#x27;:
+        return mac_sep_avdefrev()
+    elif get_platform().startswith(&#x27;linux&#x27;):
+        return linux_sep_avdefrev()
+    else:
+        return &quot;Unsupported platform&quot;
+
+
+if __name__ == &#x27;__main__&#x27;:
+    try:
+        r = sensor_main()
+    except Exception as e:
+        r = traceback.format_exc().replace(&#x27;\n&#x27;, &#x27;-&gt;&#x27;)
+    try:
+        tanium.results.add(r)
+    except (AttributeError, NameError):
+        print(r)
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>6</sensor_type>
+                <os>3</os>
+                <query>#!&#x2F;bin&#x2F;sh
+
+# THIS IS A STUB - NOT INTENDED AS FUNCTIONAL - NA
+# 
+# 
+
+echo &quot;N&#x2F;A on Solaris&quot;
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>6</sensor_type>
+                <os>4</os>
+                <query>#!&#x2F;bin&#x2F;sh
+
+# THIS IS A STUB - NOT INTENDED AS FUNCTIONAL - NA
+# 
+# 
+
+echo &quot;N&#x2F;A on AIX&quot;
+</query>
+                <signature></signature>
+            </sensor_query>
+        </queries>
+        <columns>
+            <column>
+                <column_index>0</column_index>
+                <name>Revision Date SEP AV</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>1</column_index>
+                <name>Revision Number SEP AV</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>9</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>2</column_index>
+                <name>Revision Date Friendly AV</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>6</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>3</column_index>
+                <name>Days since last update</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>9</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+        </columns>
+        <meta_data/>
+        <content_set>
+            <name>Default</name>
+            <description></description>
+            <reserved_name>default</reserved_name>
+            <meta_data/>
+        </content_set>
+    </sensor>
+</content>

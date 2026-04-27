@@ -1,0 +1,84 @@
+<!-- Exported using version "7_4_3_1242" on Wednesday, October 14, 2020 7:52:27 AM -->
+<content>
+    <sensor>
+        <name>CUST - Tanium Client folder size Friendly</name>
+        <what_hash>1511110054</what_hash>
+        <category>Miscellaneous</category>
+        <description>Returns the folder size of the Tanium Client install folder in GB, round up with only one digit decimal.</description>
+        <result_type>1</result_type>
+        <qseconds>900</qseconds>
+        <ignore_case_flag>1</ignore_case_flag>
+        <delimiter>|</delimiter>
+        <hidden_flag>0</hidden_flag>
+        <queries>
+            <sensor_query>
+                <sensor_type>8</sensor_type>
+                <os>0</os>
+                <query>import tanium
+import os
+
+def get_size(start_path = tanium.client.get_client_dir()):
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(start_path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            total_size += os.path.getsize(fp)
+    
+    return total_size
+
+size=float(get_size()) &#x2F; (2**20) &#x2F; 1000  
+tanium.results.add(round(size,1))
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>8</sensor_type>
+                <os>1</os>
+                <query>import tanium
+import os
+
+def get_size(start_path = tanium.client.get_client_dir()):
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(start_path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            total_size += os.path.getsize(fp)
+    
+    return total_size
+
+size=float(get_size()) &#x2F; (2**20) &#x2F; 1000  
+tanium.results.add(round(size,1))
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>8</sensor_type>
+                <os>2</os>
+                <query>import tanium
+import os
+
+def get_size(start_path = tanium.client.get_client_dir()):
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(start_path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            total_size += os.path.getsize(fp)
+    
+    return total_size
+
+size=float(get_size()) &#x2F; (2**20) &#x2F; 1000  
+tanium.results.add(round(size,1))
+</query>
+                <signature></signature>
+            </sensor_query>
+        </queries>
+        <columns/>
+        <meta_data/>
+        <content_set>
+            <name>Default</name>
+            <description></description>
+            <reserved_name>default</reserved_name>
+            <meta_data/>
+        </content_set>
+    </sensor>
+</content>

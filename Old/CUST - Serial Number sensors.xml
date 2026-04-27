@@ -1,0 +1,36 @@
+<!-- Exported using version "7_4_3_1242" on Monday, October 12, 2020 1:34:14 PM -->
+<content>
+    <sensor>
+        <name>CUST - Serial Number</name>
+        <what_hash>4221428864</what_hash>
+        <category>Miscellaneous</category>
+        <description>Sensor return Serial Number in Python to verify TDS issue.
+Windows Only</description>
+        <result_type>1</result_type>
+        <qseconds>900</qseconds>
+        <ignore_case_flag>1</ignore_case_flag>
+        <delimiter>|</delimiter>
+        <hidden_flag>0</hidden_flag>
+        <queries>
+            <sensor_query>
+                <sensor_type>8</sensor_type>
+                <os>0</os>
+                <query>import subprocess
+import tanium
+
+current_machine_id = subprocess.check_output(&#x27;wmic csproduct get uuid&#x27;).decode().split(&#x27;\n&#x27;)[1].strip()
+tanium.results.add(current_machine_id)
+</query>
+                <signature></signature>
+            </sensor_query>
+        </queries>
+        <columns/>
+        <meta_data/>
+        <content_set>
+            <name>Default</name>
+            <description></description>
+            <reserved_name>default</reserved_name>
+            <meta_data/>
+        </content_set>
+    </sensor>
+</content>

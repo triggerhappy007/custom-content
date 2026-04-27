@@ -1,0 +1,271 @@
+<!-- Exported using version "7_4_3_1242" on Monday, October 12, 2020 1:33:12 PM -->
+<content>
+    <sensor>
+        <name>CUST - Comply reports older than 10 days</name>
+        <what_hash>2510836693</what_hash>
+        <category>Miscellaneous</category>
+        <description>This report will parse the Comply scan and returns True&#x2F;False is the scan is older than 10 days. To be used for Compliance scan monitoring.</description>
+        <result_type>1</result_type>
+        <qseconds>900</qseconds>
+        <ignore_case_flag>1</ignore_case_flag>
+        <delimiter>|</delimiter>
+        <hidden_flag>0</hidden_flag>
+        <queries>
+            <sensor_query>
+                <sensor_type>8</sensor_type>
+                <os>0</os>
+                <query>import tanium
+import os
+import time
+import datetime
+
+#Value to set based on requirements.
+max_age=10
+
+#Create list where we will store the filenames found
+files = []
+age_days=0
+
+
+if tanium.os_help.is_windows():
+    results_folder = tanium.client.get_client_dir() + &quot;\\Tools\\Comply\\results&quot;
+
+if tanium.os_help.is_mac():
+    results_folder = tanium.client.get_client_dir() + &quot;&#x2F;Tools&#x2F;Comply&#x2F;results&quot;
+
+if tanium.os_help.is_linux():
+    results_folder = tanium.client.get_client_dir() + &quot;&#x2F;Tools&#x2F;Comply&#x2F;results&quot;
+
+suffix = &quot;aggregate.txt&quot;
+
+#Slice the file found in 3 part (r)oot, (d)irectory and (f)ilename
+for r, d, f in os.walk(results_folder):
+    for file in f:
+        if file.endswith(suffix): 
+            files.append(os.path.join(r, file)) #rebuild full file name in list created earlier
+
+
+
+for f in files:
+
+    #get time stamp of file and convert to compare with today&#x27;s date
+    file_date = time.ctime(os.path.getmtime(f))
+    try:
+      file_date = datetime.datetime.strptime(file_date, &quot;%a %b %d %H:%M:%S %Y&quot;)
+      file_date=str(file_date.strftime(&#x27;%Y-%m-%d&#x27;))
+      today_date=str(datetime.date.today())
+      date_format = &quot;%Y-%m-%d&quot;
+      a = datetime.datetime.strptime(file_date, date_format)
+      b = datetime.datetime.strptime(today_date, date_format)
+      age_days=str(b-a)
+      age_days=age_days.split(&#x27; day&#x27;)[0]
+      if age_days.startswith(&#x27;0&#x27;):
+          age_days=0
+    except:
+      import traceback
+      #tanium.results.add(traceback.format_exc())
+
+    #get hash
+    report_hash = os.path.basename(os.path.dirname(f))
+
+    #get type of scan like joval,cis-cat or scc
+    if tanium.os_help.is_windows():
+        scan_type = os.path.dirname(f).split(&#x27;\\&#x27;)[-2]
+    if tanium.os_help.is_mac():
+        scan_type = os.path.dirname(f).split(&#x27;&#x2F;&#x27;)[-2]
+    if tanium.os_help.is_linux():
+        scan_type = os.path.dirname(f).split(&#x27;&#x2F;&#x27;)[-2]
+
+    if int(age_days) &gt;= int(max_age):
+        results=str(scan_type)+&quot;|&quot;+str(report_hash)+&quot;|True&quot;
+        tanium.results.add(results)
+    else:
+        results=str(scan_type)+&quot;|&quot;+str(report_hash)+&quot;|False&quot;
+        tanium.results.add(results)
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>8</sensor_type>
+                <os>1</os>
+                <query>import tanium
+import os
+import time
+import datetime
+
+#Value to set based on requirements.
+max_age=10
+
+#Create list where we will store the filenames found
+files = []
+age_days=0
+
+
+if tanium.os_help.is_windows():
+    results_folder = tanium.client.get_client_dir() + &quot;\\Tools\\Comply\\results&quot;
+
+if tanium.os_help.is_mac():
+    results_folder = tanium.client.get_client_dir() + &quot;&#x2F;Tools&#x2F;Comply&#x2F;results&quot;
+
+if tanium.os_help.is_linux():
+    results_folder = tanium.client.get_client_dir() + &quot;&#x2F;Tools&#x2F;Comply&#x2F;results&quot;
+
+suffix = &quot;aggregate.txt&quot;
+
+#Slice the file found in 3 part (r)oot, (d)irectory and (f)ilename
+for r, d, f in os.walk(results_folder):
+    for file in f:
+        if file.endswith(suffix): 
+            files.append(os.path.join(r, file)) #rebuild full file name in list created earlier
+
+
+
+for f in files:
+
+    #get time stamp of file and convert to compare with today&#x27;s date
+    file_date = time.ctime(os.path.getmtime(f))
+    try:
+      file_date = datetime.datetime.strptime(file_date, &quot;%a %b %d %H:%M:%S %Y&quot;)
+      file_date=str(file_date.strftime(&#x27;%Y-%m-%d&#x27;))
+      today_date=str(datetime.date.today())
+      date_format = &quot;%Y-%m-%d&quot;
+      a = datetime.datetime.strptime(file_date, date_format)
+      b = datetime.datetime.strptime(today_date, date_format)
+      age_days=str(b-a)
+      age_days=age_days.split(&#x27; day&#x27;)[0]
+      if age_days.startswith(&#x27;0&#x27;):
+          age_days=0
+    except:
+      import traceback
+      #tanium.results.add(traceback.format_exc())
+
+    #get hash
+    report_hash = os.path.basename(os.path.dirname(f))
+
+    #get type of scan like joval,cis-cat or scc
+    if tanium.os_help.is_windows():
+        scan_type = os.path.dirname(f).split(&#x27;\\&#x27;)[-2]
+    if tanium.os_help.is_mac():
+        scan_type = os.path.dirname(f).split(&#x27;&#x2F;&#x27;)[-2]
+    if tanium.os_help.is_linux():
+        scan_type = os.path.dirname(f).split(&#x27;&#x2F;&#x27;)[-2]
+
+    if int(age_days) &gt;= int(max_age):
+        results=str(scan_type)+&quot;|&quot;+str(report_hash)+&quot;|True&quot;
+        tanium.results.add(results)
+    else:
+        results=str(scan_type)+&quot;|&quot;+str(report_hash)+&quot;|False&quot;
+        tanium.results.add(results)
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>8</sensor_type>
+                <os>2</os>
+                <query>import tanium
+import os
+import time
+import datetime
+
+#Value to set based on requirements.
+max_age=10
+
+#Create list where we will store the filenames found
+files = []
+age_days=0
+
+
+if tanium.os_help.is_windows():
+    results_folder = tanium.client.get_client_dir() + &quot;\\Tools\\Comply\\results&quot;
+
+if tanium.os_help.is_mac():
+    results_folder = tanium.client.get_client_dir() + &quot;&#x2F;Tools&#x2F;Comply&#x2F;results&quot;
+
+if tanium.os_help.is_linux():
+    results_folder = tanium.client.get_client_dir() + &quot;&#x2F;Tools&#x2F;Comply&#x2F;results&quot;
+
+suffix = &quot;aggregate.txt&quot;
+
+#Slice the file found in 3 part (r)oot, (d)irectory and (f)ilename
+for r, d, f in os.walk(results_folder):
+    for file in f:
+        if file.endswith(suffix): 
+            files.append(os.path.join(r, file)) #rebuild full file name in list created earlier
+
+
+
+for f in files:
+
+    #get time stamp of file and convert to compare with today&#x27;s date
+    file_date = time.ctime(os.path.getmtime(f))
+    try:
+      file_date = datetime.datetime.strptime(file_date, &quot;%a %b %d %H:%M:%S %Y&quot;)
+      file_date=str(file_date.strftime(&#x27;%Y-%m-%d&#x27;))
+      today_date=str(datetime.date.today())
+      date_format = &quot;%Y-%m-%d&quot;
+      a = datetime.datetime.strptime(file_date, date_format)
+      b = datetime.datetime.strptime(today_date, date_format)
+      age_days=str(b-a)
+      age_days=age_days.split(&#x27; day&#x27;)[0]
+      if age_days.startswith(&#x27;0&#x27;):
+          age_days=0
+    except:
+      import traceback
+      #tanium.results.add(traceback.format_exc())
+
+    #get hash
+    report_hash = os.path.basename(os.path.dirname(f))
+
+    #get type of scan like joval,cis-cat or scc
+    if tanium.os_help.is_windows():
+        scan_type = os.path.dirname(f).split(&#x27;\\&#x27;)[-2]
+    if tanium.os_help.is_mac():
+        scan_type = os.path.dirname(f).split(&#x27;&#x2F;&#x27;)[-2]
+    if tanium.os_help.is_linux():
+        scan_type = os.path.dirname(f).split(&#x27;&#x2F;&#x27;)[-2]
+
+    if int(age_days) &gt;= int(max_age):
+        results=str(scan_type)+&quot;|&quot;+str(report_hash)+&quot;|True&quot;
+        tanium.results.add(results)
+    else:
+        results=str(scan_type)+&quot;|&quot;+str(report_hash)+&quot;|False&quot;
+        tanium.results.add(results)
+</query>
+                <signature></signature>
+            </sensor_query>
+        </queries>
+        <columns>
+            <column>
+                <column_index>0</column_index>
+                <name>Type of Scan</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>1</column_index>
+                <name>Report Hash</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>2</column_index>
+                <name>More than 10 days</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+        </columns>
+        <meta_data/>
+        <content_set>
+            <name>Default</name>
+            <description></description>
+            <reserved_name>default</reserved_name>
+            <meta_data/>
+        </content_set>
+    </sensor>
+</content>

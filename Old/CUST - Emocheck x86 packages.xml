@@ -1,0 +1,38 @@
+<!-- Exported using version "7_4_3_1242" on Monday, October 12, 2020 12:24:33 PM -->
+<content>
+    <tanium_package>
+        <name>CUST - Emocheck x86</name>
+        <display_name>CUST - Emocheck x86</display_name>
+        <command_line>cmd &#x2F;c emocheck_v1.0_x86.exe -quiet -output %temp%</command_line>
+        <command_line_timeout>60</command_line_timeout>
+        <download_seconds>600</download_seconds>
+        <hidden_flag>0</hidden_flag>
+        <process_group_flag>1</process_group_flag>
+        <signature/>
+        <verify_expire_seconds>600</verify_expire_seconds>
+        <skip_lock_flag>0</skip_lock_flag>
+        <prompt_text>{&quot;parameters&quot;:[],&quot;model&quot;:&quot;com.tanium.components.parameters::ParametersArray&quot;,&quot;parameterType&quot;:&quot;com.tanium.components.parameters::ParametersArray&quot;}</prompt_text>
+        <package_files>
+            <package_file>
+                <file_name>emocheck_v1.0_x86.exe</file_name>
+                <hash>544b6eb3bc04e9015ae7b4078e20a33a28c35370fb9e2c498d65e072c4c81bf3</hash>
+                <source></source>
+                <download_seconds>0</download_seconds>
+                <size>824176</size>
+                <type>0</type>
+            </package_file>
+        </package_files>
+        <meta_data/>
+        <verify_group>
+            <group>
+                <id>0</id>
+            </group>
+        </verify_group>
+        <content_set>
+            <name>Default</name>
+            <description></description>
+            <reserved_name>default</reserved_name>
+            <meta_data/>
+        </content_set>
+    </tanium_package>
+</content>

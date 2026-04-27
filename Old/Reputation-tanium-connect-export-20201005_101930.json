@@ -1,0 +1,555 @@
+[
+  {
+    "name": "Reputation - Running Processes with Hash (SHA256)",
+    "description": "Get \"Running Processes with Hash\"[SHA256] from all machines",
+    "minimumPassPercentage": 0,
+    "logLevel": 30,
+    "schedule": "55 * * * *",
+    "scheduleTimeZone": "UTC",
+    "moduleCallbackUri": null,
+    "maxOldSpaceSize": 1,
+    "streams": [
+      {
+        "route": "/v1/sources/savedquestions",
+        "arguments": {
+          "sortColumns": "[]",
+          "savedQuestionName": "Reputation - Running Processes with Hash (SHA256)",
+          "contextGroupName": "All Computers",
+          "percentComplete": 0,
+          "batchSize": 1000,
+          "hideErrors": true,
+          "hideNoResults": false,
+          "excludePolling": false,
+          "flatten": true,
+          "mostRecent": false,
+          "timeout": 10,
+          "recentResultBuckets": "600,3600,86400,604800",
+          "filterString": "",
+          "maxRows": -1,
+          "includeOtherRow": false
+        }
+      },
+      {
+        "route": "/v1/destinations/pluginConfigurations/destinations/reputations",
+        "arguments": {
+          "config": {
+            "hashColumn": "Hash"
+          },
+          "module": "reputation",
+          "plugin": "reputation-destination",
+          "type": "destinations",
+          "destinationType": "pluginConfigurations",
+          "name": "reputation-reputation-destination-1601798109003-60"
+        }
+      }
+    ],
+    "destinationType": "reputations"
+  },
+  {
+    "name": "Reputation - Linux Autoruns (MD5)",
+    "description": "Get Linux AutoRuns[MD5,1] from all machines with Is Linux contains true",
+    "minimumPassPercentage": 0,
+    "logLevel": 30,
+    "schedule": "55 */3 * * *",
+    "scheduleTimeZone": "UTC",
+    "moduleCallbackUri": null,
+    "maxOldSpaceSize": 1,
+    "streams": [
+      {
+        "route": "/v1/sources/savedquestions",
+        "arguments": {
+          "sortColumns": "[]",
+          "savedQuestionName": "Reputation - Linux Autoruns (MD5)",
+          "contextGroupName": "All Computers",
+          "percentComplete": 0,
+          "batchSize": 1000,
+          "hideErrors": true,
+          "hideNoResults": false,
+          "excludePolling": false,
+          "flatten": true,
+          "mostRecent": false,
+          "timeout": 10,
+          "recentResultBuckets": "600,3600,86400,604800",
+          "filterString": "",
+          "maxRows": -1,
+          "includeOtherRow": false
+        }
+      },
+      {
+        "route": "/v1/destinations/pluginConfigurations/destinations/reputations",
+        "arguments": {
+          "config": {
+            "hashColumn": "Hash"
+          },
+          "module": "reputation",
+          "plugin": "reputation-destination",
+          "type": "destinations",
+          "destinationType": "pluginConfigurations",
+          "name": "reputation-reputation-destination-1601798045629-5"
+        }
+      }
+    ],
+    "destinationType": "reputations"
+  },
+  {
+    "name": "Reputation - Mac Autoruns (MD5)\t",
+    "description": "Get Mac AutoRuns[MD5,1] from all machines with Is Mac contains true",
+    "minimumPassPercentage": 0,
+    "logLevel": 30,
+    "schedule": "50 */3 * * *",
+    "scheduleTimeZone": "UTC",
+    "moduleCallbackUri": null,
+    "maxOldSpaceSize": 1,
+    "streams": [
+      {
+        "route": "/v1/sources/savedquestions",
+        "arguments": {
+          "sortColumns": "[]",
+          "savedQuestionName": "Reputation - Mac Autoruns (MD5)",
+          "contextGroupName": "All Computers",
+          "percentComplete": 0,
+          "batchSize": 1000,
+          "hideErrors": true,
+          "hideNoResults": false,
+          "excludePolling": false,
+          "flatten": true,
+          "mostRecent": false,
+          "timeout": 10,
+          "recentResultBuckets": "600,3600,86400,604800",
+          "filterString": "",
+          "maxRows": -1,
+          "includeOtherRow": false
+        }
+      },
+      {
+        "route": "/v1/destinations/pluginConfigurations/destinations/reputations",
+        "arguments": {
+          "config": {
+            "hashColumn": "Hash"
+          },
+          "module": "reputation",
+          "plugin": "reputation-destination",
+          "type": "destinations",
+          "destinationType": "pluginConfigurations",
+          "name": "reputation-reputation-destination-1601797991780-18"
+        }
+      }
+    ],
+    "destinationType": "reputations"
+  },
+  {
+    "name": "Reputation - Trace Executed Process Hashes (MD5)",
+    "description": "Get Trace Executed Process Hashes[3 hours,1571257836726|1571261435726,500] from all machines",
+    "minimumPassPercentage": 0,
+    "logLevel": 30,
+    "schedule": "45 * * * *",
+    "scheduleTimeZone": "UTC",
+    "moduleCallbackUri": null,
+    "maxOldSpaceSize": 1,
+    "streams": [
+      {
+        "route": "/v1/sources/savedquestions",
+        "arguments": {
+          "sortColumns": "[]",
+          "savedQuestionName": "Reputation - Trace Executed Process Hashes (MD5)",
+          "contextGroupName": "All Computers",
+          "percentComplete": 0,
+          "batchSize": 1000,
+          "hideErrors": true,
+          "hideNoResults": false,
+          "excludePolling": false,
+          "flatten": true,
+          "mostRecent": false,
+          "timeout": 10,
+          "recentResultBuckets": "600,3600,86400,604800",
+          "filterString": "",
+          "maxRows": -1,
+          "includeOtherRow": false
+        }
+      },
+      {
+        "route": "/v1/destinations/pluginConfigurations/destinations/reputations",
+        "arguments": {
+          "config": {
+            "hashColumn": "MD5"
+          },
+          "module": "reputation",
+          "plugin": "reputation-destination",
+          "type": "destinations",
+          "destinationType": "pluginConfigurations",
+          "name": "reputation-reputation-destination-1601797935845-59"
+        }
+      }
+    ],
+    "destinationType": "reputations"
+  },
+  {
+    "name": "Reputation - Service Module Details (SHA256)",
+    "description": "Get \"Service Module Details with Hash\"[sha256] from all machines",
+    "minimumPassPercentage": 0,
+    "logLevel": 30,
+    "schedule": "40 * * * *",
+    "scheduleTimeZone": "UTC",
+    "moduleCallbackUri": null,
+    "maxOldSpaceSize": 1,
+    "streams": [
+      {
+        "route": "/v1/sources/savedquestions",
+        "arguments": {
+          "sortColumns": "[]",
+          "savedQuestionName": "Reputation - Service Module Details (SHA256)",
+          "contextGroupName": "All Computers",
+          "percentComplete": 0,
+          "batchSize": 1000,
+          "hideErrors": true,
+          "hideNoResults": false,
+          "excludePolling": false,
+          "flatten": true,
+          "mostRecent": false,
+          "timeout": 10,
+          "recentResultBuckets": "600,3600,86400,604800",
+          "filterString": "",
+          "maxRows": -1,
+          "includeOtherRow": false
+        }
+      },
+      {
+        "route": "/v1/destinations/pluginConfigurations/destinations/reputations",
+        "arguments": {
+          "config": {
+            "hashColumn": "Hash of Binary"
+          },
+          "module": "reputation",
+          "plugin": "reputation-destination",
+          "type": "destinations",
+          "destinationType": "pluginConfigurations",
+          "name": "reputation-reputation-destination-1601797854746-0"
+        }
+      }
+    ],
+    "destinationType": "reputations"
+  },
+  {
+    "name": "Reputation - Loaded Modules (SHA256)",
+    "description": "Get \"Loaded Modules with Hash\"[SHA256] from all machines",
+    "minimumPassPercentage": 0,
+    "logLevel": 30,
+    "schedule": "35 * * * *",
+    "scheduleTimeZone": "UTC",
+    "moduleCallbackUri": null,
+    "maxOldSpaceSize": 1,
+    "streams": [
+      {
+        "route": "/v1/sources/savedquestions",
+        "arguments": {
+          "sortColumns": "[]",
+          "savedQuestionName": "Reputation - Loaded Modules (SHA256)",
+          "contextGroupName": "All Computers",
+          "percentComplete": 0,
+          "batchSize": 1000,
+          "hideErrors": true,
+          "hideNoResults": false,
+          "excludePolling": false,
+          "flatten": true,
+          "mostRecent": false,
+          "timeout": 10,
+          "recentResultBuckets": "600,3600,86400,604800",
+          "filterString": "",
+          "maxRows": -1,
+          "includeOtherRow": false
+        }
+      },
+      {
+        "route": "/v1/destinations/pluginConfigurations/destinations/reputations",
+        "arguments": {
+          "config": {
+            "hashColumn": "Hash"
+          },
+          "module": "reputation",
+          "plugin": "reputation-destination",
+          "type": "destinations",
+          "destinationType": "pluginConfigurations",
+          "name": "reputation-reputation-destination-1601797774670-53"
+        }
+      }
+    ],
+    "destinationType": "reputations"
+  },
+  {
+    "name": "Reputation - Recently Changed ELF",
+    "description": "Get Index Query File Hash Recently Changed[0,*,*,*,*,*,*,7F454C46*,3,300,1] from all machines",
+    "minimumPassPercentage": 0,
+    "logLevel": 30,
+    "schedule": "30 */3 * * *",
+    "scheduleTimeZone": "UTC",
+    "moduleCallbackUri": null,
+    "maxOldSpaceSize": 1,
+    "streams": [
+      {
+        "route": "/v1/sources/savedquestions",
+        "arguments": {
+          "sortColumns": "[]",
+          "savedQuestionName": "Reputation - Recently Changed ELF",
+          "contextGroupName": "All Computers",
+          "percentComplete": 0,
+          "batchSize": 1000,
+          "hideErrors": true,
+          "hideNoResults": false,
+          "excludePolling": false,
+          "flatten": true,
+          "mostRecent": false,
+          "timeout": 10,
+          "recentResultBuckets": "600,3600,86400,604800",
+          "filterString": "",
+          "maxRows": -1,
+          "includeOtherRow": false
+        }
+      },
+      {
+        "route": "/v1/destinations/pluginConfigurations/destinations/reputations",
+        "arguments": {
+          "config": {
+            "hashColumn": "SHA256 Hash"
+          },
+          "module": "reputation",
+          "plugin": "reputation-destination",
+          "type": "destinations",
+          "destinationType": "pluginConfigurations",
+          "name": "reputation-reputation-destination-1601797707393-31"
+        }
+      }
+    ],
+    "destinationType": "reputations"
+  },
+  {
+    "name": "Reputation - Recently Changed MACHO 64 Bit",
+    "description": "Get Index Query File Hash Recently Changed[0,*,*,*,*,*,*,FEEDFACF*,3,300,1] from all machines",
+    "minimumPassPercentage": 0,
+    "logLevel": 30,
+    "schedule": "25 */3 * * *",
+    "scheduleTimeZone": "UTC",
+    "moduleCallbackUri": null,
+    "maxOldSpaceSize": 1,
+    "streams": [
+      {
+        "route": "/v1/sources/savedquestions",
+        "arguments": {
+          "sortColumns": "[]",
+          "savedQuestionName": "Reputation - Recently Changed MACHO 64 Bit",
+          "contextGroupName": "All Computers",
+          "percentComplete": 0,
+          "batchSize": 1000,
+          "hideErrors": true,
+          "hideNoResults": false,
+          "excludePolling": false,
+          "flatten": true,
+          "mostRecent": false,
+          "timeout": 10,
+          "recentResultBuckets": "600,3600,86400,604800",
+          "filterString": "",
+          "maxRows": -1,
+          "includeOtherRow": false
+        }
+      },
+      {
+        "route": "/v1/destinations/pluginConfigurations/destinations/reputations",
+        "arguments": {
+          "config": {
+            "hashColumn": "SHA256 Hash"
+          },
+          "module": "reputation",
+          "plugin": "reputation-destination",
+          "type": "destinations",
+          "destinationType": "pluginConfigurations",
+          "name": "reputation-reputation-destination-1601797632614-73"
+        }
+      }
+    ],
+    "destinationType": "reputations"
+  },
+  {
+    "name": "Reputation - Recently Changed MACHO 32 Bit",
+    "description": "Get Index Query File Hash Recently Changed[0,*,*,*,*,*,*,FEEDFACE*,3,300,1] from all machines",
+    "minimumPassPercentage": 0,
+    "logLevel": 30,
+    "schedule": "20 * * * *",
+    "scheduleTimeZone": "UTC",
+    "moduleCallbackUri": null,
+    "maxOldSpaceSize": 1,
+    "streams": [
+      {
+        "route": "/v1/sources/savedquestions",
+        "arguments": {
+          "sortColumns": "[]",
+          "savedQuestionName": "Reputation - Recently Changed MACHO 32 Bit",
+          "contextGroupName": "All Computers",
+          "percentComplete": 0,
+          "batchSize": 1000,
+          "hideErrors": true,
+          "hideNoResults": false,
+          "excludePolling": false,
+          "flatten": true,
+          "mostRecent": false,
+          "timeout": 10,
+          "recentResultBuckets": "600,3600,86400,604800",
+          "filterString": "",
+          "maxRows": -1,
+          "includeOtherRow": false
+        }
+      },
+      {
+        "route": "/v1/destinations/pluginConfigurations/destinations/reputations",
+        "arguments": {
+          "config": {
+            "hashColumn": "SHA256 Hash"
+          },
+          "module": "reputation",
+          "plugin": "reputation-destination",
+          "type": "destinations",
+          "destinationType": "pluginConfigurations",
+          "name": "reputation-reputation-destination-1601797530711-0"
+        }
+      }
+    ],
+    "destinationType": "reputations"
+  },
+  {
+    "name": "Reputation - MS EXE Recently Changed",
+    "description": "Get Index Query File Hash Recently Changed[0,*,*,*,*,*,*,4D5A*,3,300,1] from all machines",
+    "minimumPassPercentage": 0,
+    "logLevel": 30,
+    "schedule": "15 */3 * * *",
+    "scheduleTimeZone": "UTC",
+    "moduleCallbackUri": null,
+    "maxOldSpaceSize": 1,
+    "streams": [
+      {
+        "route": "/v1/sources/savedquestions",
+        "arguments": {
+          "sortColumns": "[]",
+          "savedQuestionName": "Reputation - MS EXE Recently Changed",
+          "contextGroupName": "All Computers",
+          "percentComplete": 0,
+          "batchSize": 1000,
+          "hideErrors": true,
+          "hideNoResults": false,
+          "excludePolling": false,
+          "flatten": true,
+          "mostRecent": false,
+          "timeout": 10,
+          "recentResultBuckets": "600,3600,86400,604800",
+          "filterString": "",
+          "maxRows": -1,
+          "includeOtherRow": false
+        }
+      },
+      {
+        "route": "/v1/destinations/pluginConfigurations/destinations/reputations",
+        "arguments": {
+          "config": {
+            "hashColumn": "SHA256 Hash"
+          },
+          "module": "reputation",
+          "plugin": "reputation-destination",
+          "type": "destinations",
+          "destinationType": "pluginConfigurations",
+          "name": "reputation-reputation-destination-1601797416479-58"
+        }
+      }
+    ],
+    "destinationType": "reputations"
+  },
+  {
+    "name": "Reputation - Driver Details (SHA 256)",
+    "description": "Get \"Driver Details with Hash\"[SHA256] FROM all machines",
+    "minimumPassPercentage": 0,
+    "logLevel": 30,
+    "schedule": "10 * * * *",
+    "scheduleTimeZone": "UTC",
+    "moduleCallbackUri": null,
+    "maxOldSpaceSize": 1,
+    "streams": [
+      {
+        "route": "/v1/sources/savedquestions",
+        "arguments": {
+          "sortColumns": "[]",
+          "savedQuestionName": "Reputation - Driver Details (SHA 256)",
+          "contextGroupName": "All Computers",
+          "percentComplete": 0,
+          "batchSize": 1000,
+          "hideErrors": true,
+          "hideNoResults": false,
+          "excludePolling": false,
+          "flatten": true,
+          "mostRecent": false,
+          "timeout": 10,
+          "recentResultBuckets": "600,3600,86400,604800",
+          "filterString": "",
+          "maxRows": -1,
+          "includeOtherRow": false
+        }
+      },
+      {
+        "route": "/v1/destinations/pluginConfigurations/destinations/reputations",
+        "arguments": {
+          "config": {
+            "hashColumn": "Hash"
+          },
+          "module": "reputation",
+          "plugin": "reputation-destination",
+          "type": "destinations",
+          "destinationType": "pluginConfigurations",
+          "name": "reputation-reputation-destination-1601797265553-90"
+        }
+      }
+    ],
+    "destinationType": "reputations"
+  },
+  {
+    "name": "Reputation - Windows AutoRuns (SHA 256)",
+    "description": "Get AutoRun Files[SHA256,1] from all machines with is Windows contains true",
+    "minimumPassPercentage": 0,
+    "logLevel": 30,
+    "schedule": "5 */3 * * *",
+    "scheduleTimeZone": "UTC",
+    "moduleCallbackUri": null,
+    "maxOldSpaceSize": 1,
+    "streams": [
+      {
+        "route": "/v1/sources/savedquestions",
+        "arguments": {
+          "sortColumns": "[]",
+          "savedQuestionName": "Reputation - Windows AutoRuns (SHA 256)",
+          "contextGroupName": "All Computers",
+          "percentComplete": 0,
+          "batchSize": 1000,
+          "hideErrors": true,
+          "hideNoResults": false,
+          "excludePolling": false,
+          "flatten": true,
+          "mostRecent": false,
+          "timeout": 10,
+          "recentResultBuckets": "600,3600,86400,604800",
+          "filterString": "",
+          "maxRows": -1,
+          "includeOtherRow": false
+        }
+      },
+      {
+        "route": "/v1/destinations/pluginConfigurations/destinations/reputations",
+        "arguments": {
+          "config": {
+            "hashColumn": "Hash",
+            "pageSize": "1000"
+          },
+          "module": "reputation",
+          "plugin": "reputation-destination",
+          "type": "destinations",
+          "destinationType": "pluginConfigurations",
+          "name": "reputation-reputation-destination-1601797069719-68"
+        }
+      }
+    ],
+    "destinationType": "reputations"
+  }
+]

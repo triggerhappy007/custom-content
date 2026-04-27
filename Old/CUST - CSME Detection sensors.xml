@@ -1,0 +1,198 @@
+<!-- Exported using version "7_4_3_1242" on Monday, October 12, 2020 11:05:52 AM -->
+<content>
+    <sensor>
+        <name>CUST - CSME Detection</name>
+        <what_hash>4212524376</what_hash>
+        <category>Miscellaneous</category>
+        <description>Sensor based on parsing output from Intel CSME tool
+
+https:&#x2F;&#x2F;downloadcenter.intel.com&#x2F;download&#x2F;28632&#x2F;Intel-Converged-Security-and-Management-Engine-Intel-CSME-Detection-Tool
+
+Works with same package to deploy and run tool in %TEMP% folder</description>
+        <result_type>1</result_type>
+        <qseconds>900</qseconds>
+        <ignore_case_flag>1</ignore_case_flag>
+        <delimiter>|</delimiter>
+        <hidden_flag>0</hidden_flag>
+        <queries>
+            <sensor_query>
+                <sensor_type>8</sensor_type>
+                <os>0</os>
+                <query># CSME Detection report sensor
+# Version = 1.0
+# TAM - Laurent Chappe 20201005
+
+import tanium
+import os
+import sys
+import tempfile
+import xml.etree.ElementTree as ET
+
+#Create list where we will store the filenames found
+files = []
+
+
+def find_CSME_reports():
+    #print (tempfile.gettempdir())
+    suffix = &quot;.xml&quot;
+    prefix = &quot;CSME-Version-Detection-Tool-&quot;
+
+    #Slice the file found in 3 part (r)oot, (d)irectory and (f)ilename
+    for r, d, f in os.walk(tempfile.gettempdir()):
+        for file in f:
+            if file.endswith(suffix) &amp; file.startswith(prefix): 
+                files.append(os.path.join(r, file)) #rebuild full file name in list created earlier
+    
+    return files
+
+
+def sensor_main():
+    files=find_CSME_reports()
+
+    #Making sensor return a nice message based on OS if nothing found             
+    if not files:
+        if sys.platform.startswith(&#x27;win32&#x27;):
+            tanium.results.add(&quot;No Intel CSME scan file found - Windows&quot;) 
+        elif sys.platform.startswith(&#x27;linux&#x27;):
+            tanium.results.add(&quot;No Intel CSME scan file found - Linux&quot;)
+        elif sys.platform.startswith(&#x27;darwin&#x27;):
+            tanium.results.add(&quot;No Intel CSME scan file found - MacOS&quot;)
+    else:
+        for f in files:
+            tree = ET.parse(f)
+            root = tree.getroot()
+            
+            output = []
+      
+            for entry in root.findall(&quot;*&quot;):
+                output.append(entry.text)
+            for entry in root.findall(&quot;*&#x2F;*&quot;):
+                output.append(entry.text)
+             
+            result=output[1]+&quot;|&quot;+output[3]+&quot;|&quot;+output[7]+&quot;|&quot;+output[9]+&quot;|&quot;+output[10]+&quot;|&quot;+output[11]+&quot;|&quot;+output[12]+&quot;|&quot;+output[13]+&quot;|&quot;+output[14]+&quot;|&quot;+output[15]
+            tanium.results.add(result)
+            
+if __name__ == &#x27;__main__&#x27;:
+    tanium.timeout_seconds = 3
+    sensor_main()
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>6</sensor_type>
+                <os>1</os>
+                <query>#!&#x2F;bin&#x2F;sh
+
+# THIS IS A STUB - NOT INTENDED AS FUNCTIONAL - NA
+# 
+# 
+
+echo &quot;N&#x2F;A on Linux&quot;
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>6</sensor_type>
+                <os>2</os>
+                <query>#!&#x2F;bin&#x2F;sh
+
+# THIS IS A STUB - NOT INTENDED AS FUNCTIONAL - NA
+# 
+# 
+
+echo &quot;N&#x2F;A on Mac&quot;
+</query>
+                <signature></signature>
+            </sensor_query>
+        </queries>
+        <columns>
+            <column>
+                <column_index>0</column_index>
+                <name>CSME Tool Version</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>1</column_index>
+                <name>Scan Date</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>6</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>2</column_index>
+                <name>Computer Manufacturer</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>3</column_index>
+                <name>Operating System</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>4</column_index>
+                <name>Processor</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>5</column_index>
+                <name>Driver Installed</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>6</column_index>
+                <name>Driver FW Version</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>7</column_index>
+                <name>Platform</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>8</column_index>
+                <name>System Risk</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>9</column_index>
+                <name>System Risk Value</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>9</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+        </columns>
+        <meta_data/>
+        <content_set>
+            <name>Default</name>
+            <description></description>
+            <reserved_name>default</reserved_name>
+            <meta_data/>
+        </content_set>
+    </sensor>
+</content>
