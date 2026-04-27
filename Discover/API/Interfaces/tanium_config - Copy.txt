@@ -1,0 +1,6 @@
+# Tanium Gateway Configuration
+# Replace the values below with your actual URL and API token.
+# Lines starting with '#' are ignored.
+
+url=https://<customername>-api.cloud.tanium.com/plugin/products/gateway/graphql
+token=token-<your-api-token-here>
