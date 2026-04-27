@@ -1,0 +1,255 @@
+<!-- Exported using version "7_4_3_1242" on Monday, October 12, 2020 4:48:19 PM -->
+<content>
+    <sensor>
+        <name>CUST - SEP Client IPS Revision</name>
+        <what_hash>2258674707</what_hash>
+        <category>Symantec</category>
+        <description>Revision of intrusion prevention signatures loaded in SEP.
+The sensor will split the revision date and calculate the number of days from today.
+
+Windows Only</description>
+        <result_type>1</result_type>
+        <qseconds>900</qseconds>
+        <ignore_case_flag>1</ignore_case_flag>
+        <delimiter>|</delimiter>
+        <hidden_flag>0</hidden_flag>
+        <queries>
+            <sensor_query>
+                <sensor_type>4</sensor_type>
+                <os>0</os>
+                <query>&#x27;==================================
+&#x27; Symantec Endpoint Protection
+&#x27;
+&#x27; Get Client&#x27;s IPS Revision
+&#x27;==================================
+
+&#x27;@INCLUDE=&#x2F;lib&#x2F;symantec&#x2F;IsSepInstalled.vbs
+
+Option Explicit
+
+If IsSepInstalled = &quot;False&quot; Then
+	WScript.Echo &quot;Not Installed&quot;
+	WScript.Quit
+End If
+
+Const HKLM = &amp;H80000002
+Dim oWMISvc : Set oWMISvc = GetObject(&quot;winmgmts:\\.\root\cimv2&quot;)
+Dim sArch : sArch = GetArch()
+Dim oReg : Set oReg = GetRegistryProvider()
+Dim sSepDefPath : sSepDefPath = GetSepAppDataPath() &amp; &quot;\Definitions&quot;
+Dim oFSO : Set oFSO = CreateObject(&quot;Scripting.FileSystemObject&quot;)
+Dim oShell : Set oShell = CreateObject(&quot;WScript.Shell&quot;)
+
+WScript.Echo GetSepIpsRev()
+
+&#x27; Get architecture type
+Public Function GetArch
+	Dim oCS, qCS : Set qCS = oWMISvc.ExecQuery(&quot;Select SystemType from Win32_ComputerSystem&quot;)
+	For Each oCS In qCS
+		GetArch = oCS.SystemType
+	Next
+End Function &#x27;GetArch
+
+&#x27; Get registry provider
+Public Function GetRegistryProvider
+    Dim iArch, oCtx, oLocator, oServices, oRegProv
+    If sArch = &quot;x64-based PC&quot; Then
+    	iArch = 64
+	Else
+		iArch = 32
+	End If
+    Set oCtx = CreateObject(&quot;WbemScripting.SWbemNamedValueSet&quot;)
+    oCtx.Add &quot;__ProviderArchitecture&quot;, iArch
+    Set oLocator = CreateObject(&quot;Wbemscripting.SWbemLocator&quot;)
+    Set oServices = oLocator.ConnectServer(&quot;&quot;,&quot;root\default&quot;,&quot;&quot;,&quot;&quot;,,,,oCtx)
+    Set oRegProv = oServices.Get(&quot;StdRegProv&quot;)   
+    
+    Set GetRegistryProvider = oRegProv
+End Function &#x27;GetRegistryProvider
+
+&#x27; Get SEP APPDATA path
+Public Function GetSepAppDataPath
+	Dim sRegPath, sSepAppData
+	If sArch = &quot;x64-based PC&quot; Then
+		sRegPath = &quot;SOFTWARE\Wow6432Node\Symantec\Symantec Endpoint Protection\CurrentVersion\Common Client\PathExpansionMap&quot;
+	Else
+		sRegPath = &quot;SOFTWARE\Symantec\Symantec Endpoint Protection\CurrentVersion\Common Client\PathExpansionMap&quot;
+	End If
+	oReg.GetStringValue HKLM, sRegPath, &quot;AppData&quot;, sSepAppData
+	If IsNull(sSepAppData) = True Then
+		WScript.Echo &quot;SepAppDataPath Error&quot;
+		WScript.Quit
+	Else
+		GetSepAppDataPath = sSepAppData
+	End If
+End Function &#x27;GetSepAppDataPath
+
+&#x27; Get SEP IPS Revision
+Public Function GetSepIpsRev
+  	Dim fIpsDefInfo, sIpsDefInfo, RevDate
+	If oFSO.FileExists(sSepDefPath &amp; &quot;\IPSDefs\definfo.dat&quot;) Then
+		Set fIpsDefInfo = oFSO.OpenTextFile(sSepDefPath &amp; &quot;\IPSDefs\definfo.dat&quot;, 1, False, 0)
+		fIpsDefInfo.SkipLine
+		sIpsDefInfo = Split(fIpsDefInfo.ReadLine(), &quot;=&quot;, -1, 1)
+		RevDate=Split(sIpsDefInfo(1),&quot;.&quot;)
+    	
+    	GetSepIpsRev = sIpsDefInfo(1) &amp; &quot;|&quot; &amp; RevDate(1) &amp; &quot;|&quot; &amp; Mid(RevDate(0),7,2)+&quot;&#x2F;&quot;+Mid(RevDate(0),5,2)+&quot;&#x2F;&quot;+Mid(RevDate(0),1,4)&amp; &quot;|&quot; &amp; DateDiff(&quot;d&quot;,Mid(RevDate(0),7,2)+&quot;&#x2F;&quot;+Mid(RevDate(0),5,2)+&quot;&#x2F;&quot;+Mid(RevDate(0),1,4),Date)
+	Else
+		GetSepIpsRev = &quot;definfo.dat missing&quot;
+	End If
+End Function &#x27;GetSepIpsRev
+&#x27;------------ INCLUDES after this line. Do not edit past this point -----
+&#x27;- Begin file: &#x2F;lib&#x2F;symantec&#x2F;IsSepInstalled.vbs
+&#x27; Returns True or False if SEP is installed
+
+Function IsSepInstalled
+	Dim colItems : Set colItems = GetObject(&quot;winmgmts:\\.\root\cimv2&quot;).ExecQuery(&quot;Select Status from Win32_Service where Name = &#x27;SepMasterService&#x27; or Name = &#x27;Symantec AntiVirus&#x27;&quot;)
+	If colItems.Count = 0 Then
+		IsSepInstalled = &quot;False&quot;
+	Else
+		IsSepInstalled = &quot;True&quot;
+	End If
+	Set colItems = Nothing
+End Function &#x27;IsSepInstalled
+&#x27;- End file: &#x2F;lib&#x2F;symantec&#x2F;IsSepInstalled.vbs</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>6</sensor_type>
+                <os>1</os>
+                <query>#!&#x2F;bin&#x2F;sh
+
+# THIS IS A STUB - NOT INTENDED AS FUNCTIONAL - NA
+# 
+# 
+
+echo &quot;N&#x2F;A on Linux&quot;
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>8</sensor_type>
+                <os>2</os>
+                <query>from __future__ import print_function, unicode_literals
+import sys
+import os
+import subprocess
+import traceback
+try:
+    import tanium
+except ImportError as e:
+	emsg = &#x27;Error locating necessary files. Ensure IC-Python is imported and deployed.&#x27;
+	sys.exit(emsg)
+
+__author__ = &#x27;Tanium&#x27;
+__content_name__ = &#x27;SEP Client IPS Revision&#x27;
+__version__ = &#x27;1.0.1.0000&#x27;
+
+
+def get_platform():
+    return sys.platform
+
+
+def mac_sep_ipsrev():
+    fIpsRevInfo = &quot;&#x2F;Library&#x2F;Application Support&#x2F;Symantec&#x2F;Silo&#x2F;NFM&#x2F;Definitions&#x2F;symcdata&#x2F;vulnprotectiondefs&#x2F;definfo.dat&quot;
+    if os.path.exists(fIpsRevInfo):
+        fIpsDat = open(fIpsRevInfo, &quot;r&quot;)
+        for line in fIpsDat.readlines():
+            if &quot;CurDefs=&quot; in line:
+                sIpsRev = line.rpartition(&#x27;=&#x27;)[-1].rstrip(&#x27;\n&#x27;)
+                return sIpsRev
+                fIpsDat.close()
+                break
+    else:
+        return &quot;Not Installed&quot;
+
+
+def sensor_main():
+    if get_platform() == &#x27;darwin&#x27;:
+        return mac_sep_ipsrev()
+    else:
+        return &quot;Unsupported platform&quot;
+
+
+if __name__ == &#x27;__main__&#x27;:
+    try:
+        r = sensor_main()
+    except Exception as e:
+        r = traceback.format_exc().replace(&#x27;\n&#x27;, &#x27;-&gt;&#x27;)
+    try:
+        tanium.results.add(r)
+    except (AttributeError, NameError):
+        print(r)
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>6</sensor_type>
+                <os>3</os>
+                <query>#!&#x2F;bin&#x2F;sh
+
+# THIS IS A STUB - NOT INTENDED AS FUNCTIONAL - NA
+# 
+# 
+
+echo &quot;N&#x2F;A on Solaris&quot;
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>6</sensor_type>
+                <os>4</os>
+                <query>#!&#x2F;bin&#x2F;sh
+
+# THIS IS A STUB - NOT INTENDED AS FUNCTIONAL - NA
+# 
+# 
+
+echo &quot;N&#x2F;A on AIX&quot;
+</query>
+                <signature></signature>
+            </sensor_query>
+        </queries>
+        <columns>
+            <column>
+                <column_index>0</column_index>
+                <name>Revision Date SEP IPS</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>1</column_index>
+                <name>Revision Number SEP IPS</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>2</column_index>
+                <name>Revision Date Friendly IPS</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>6</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>3</column_index>
+                <name>Days since last update</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+        </columns>
+        <meta_data/>
+        <content_set>
+            <name>Default</name>
+            <description></description>
+            <reserved_name>default</reserved_name>
+            <meta_data/>
+        </content_set>
+    </sensor>
+</content>

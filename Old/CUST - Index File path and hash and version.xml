@@ -1,0 +1,707 @@
+<!-- Exported using version "7_4_3_1242" on Wednesday, October 14, 2020 7:42:05 AM -->
+<content>
+    <sensor>
+        <name>CUST - Index File path and hash and version</name>
+        <what_hash>1254968810</what_hash>
+        <category>Index</category>
+        <description>Returns path, name, and hash and version of index files matching supplied inputs
+Example : C:\Windows\SysWOW64\win32calc.exe|a20dcdbed017776c8b3d01a511a8dc46|6b0a99d565e86a37a980a95028cb2e6fe6036734|84173f0b3176f68428a88a6870af6236f28faee117074fb36a0bcccfb55eb301|10.0.14393.0</description>
+        <parameters>
+            <parameter_text>{&quot;parameters&quot;:[{&quot;parameterType&quot;:&quot;com.tanium.components.parameters::CheckBoxParameter&quot;,&quot;model&quot;:&quot;com.tanium.components.parameters::CheckBoxParameter&quot;,&quot;key&quot;:&quot;treatInputAsRegex&quot;,&quot;label&quot;:&quot;Use Regular Expressions&quot;,&quot;helpString&quot;:&quot;Select to support regular expressions for all search parameters with the exception of Maximum Number of Rows. If unselected, wildcard matching is used.&quot;},{&quot;restrict&quot;:null,&quot;maxChars&quot;:0,&quot;validationExpressions&quot;:[],&quot;promptText&quot;:&quot;Search string for file name&quot;,&quot;helpString&quot;:&quot;Search string or pattern for file name.  For example, *exe&quot;,&quot;label&quot;:&quot;File Name&quot;,&quot;key&quot;:&quot;fileName&quot;,&quot;parameterType&quot;:&quot;com.tanium.components.parameters::TextInputParameter&quot;,&quot;model&quot;:&quot;com.tanium.components.parameters::TextInputParameter&quot;,&quot;defaultValue&quot;:&quot;*&quot;},{&quot;restrict&quot;:null,&quot;maxChars&quot;:0,&quot;validationExpressions&quot;:[],&quot;promptText&quot;:&quot;Search string for an MD5 hash&quot;,&quot;helpString&quot;:&quot;Search string or pattern for an MD5 hash. For example, 1c7b*&quot;,&quot;label&quot;:&quot;File MD5 Hash&quot;,&quot;key&quot;:&quot;fileMD5Hash&quot;,&quot;parameterType&quot;:&quot;com.tanium.components.parameters::TextInputParameter&quot;,&quot;model&quot;:&quot;com.tanium.components.parameters::TextInputParameter&quot;,&quot;defaultValue&quot;:&quot;*&quot;},{&quot;restrict&quot;:null,&quot;maxChars&quot;:0,&quot;validationExpressions&quot;:[],&quot;promptText&quot;:&quot;Search string for a SHA1 hash&quot;,&quot;helpString&quot;:&quot;Search string or pattern for a SHA1 hash. For example, 1c7b*&quot;,&quot;label&quot;:&quot;File SHA1 Hash&quot;,&quot;key&quot;:&quot;fileSHA1Hash&quot;,&quot;parameterType&quot;:&quot;com.tanium.components.parameters::TextInputParameter&quot;,&quot;model&quot;:&quot;com.tanium.components.parameters::TextInputParameter&quot;,&quot;defaultValue&quot;:&quot;*&quot;},{&quot;restrict&quot;:null,&quot;maxChars&quot;:0,&quot;validationExpressions&quot;:[],&quot;promptText&quot;:&quot;Search string for a SHA256 hash&quot;,&quot;helpString&quot;:&quot;Search string or pattern for a SHA256 hash. For example, 1c7b*&quot;,&quot;label&quot;:&quot;File SHA256 Hash&quot;,&quot;key&quot;:&quot;fileSHA256Hash&quot;,&quot;parameterType&quot;:&quot;com.tanium.components.parameters::TextInputParameter&quot;,&quot;model&quot;:&quot;com.tanium.components.parameters::TextInputParameter&quot;,&quot;defaultValue&quot;:&quot;*&quot;}],&quot;model&quot;:&quot;com.tanium.components.parameters::ParametersArray&quot;,&quot;parameterType&quot;:&quot;com.tanium.components.parameters::ParametersArray&quot;}</parameter_text>
+        </parameters>
+        <result_type>1</result_type>
+        <qseconds>900</qseconds>
+        <ignore_case_flag>1</ignore_case_flag>
+        <delimiter>|</delimiter>
+        <hidden_flag>0</hidden_flag>
+        <queries>
+            <sensor_query>
+                <sensor_type>4</sensor_type>
+                <os>0</os>
+                <query>Option Explicit
+&#x27;Code produced by J. Warot for POC Use case purposes - need to be maintained and updated - August 26th 2020
+&#x27;@INCLUDE=utils&#x2F;settings&#x2F;GetClientDir.vbs
+&#x27;@INCLUDE=i18n&#x2F;UTF8Decode.vbs
+&#x27;@INCLUDE=index&#x2F;AppendWhereGlob.vbs
+&#x27;@INCLUDE=index&#x2F;GenerateValidQueryInput.vbs
+&#x27;@INCLUDE=index&#x2F;RemoveTrailingBackslashFromDir.vbs
+&#x27;@INCLUDE=index&#x2F;CheckEPIArgSupport.vbs
+&#x27;@INCLUDE=exec&#x2F;TaniumExec.vbs
+
+Dim strTaniumEpiDir,fso,strExeName,strDestFilePath,objShell,execed,strLimit,strUrlArg,strOptionalArg,strExecWrapper
+Dim strDirectoryPathIn,strFileNameIn,strSizeIn,strHashIn,strHashSHA1In,strHashSHA256In,strMagicNumberIn,strLimitIn
+Dim strDirectoryPath,strFileName,strSize,strHash,strHashSHA1,strHashSHA256,strMagicNumber
+Dim bTreatAsRegex,strTreatAsRegex
+
+strTaniumEpiDir = GetClientDir() &amp; &quot;Tools\EPI\&quot;
+strExeName = &quot;TaniumEndpointIndex.exe&quot;
+strExecWrapper = strTaniumEpiDir &amp; &quot;TaniumExecWrapper.exe&quot;
+
+Set fso = WScript.CreateObject(&quot;Scripting.Filesystemobject&quot;)
+Set objShell = CreateObject(&quot;WScript.Shell&quot;)
+strDestFilePath = strTaniumEpiDir &amp; strExeName
+
+&#x27;default limit
+strLimit=&quot;10&quot;
+
+bTreatAsRegex = False
+strTreatAsRegex = UTF8Decode(&quot;||treatInputAsRegex||&quot;)
+If Trim(strTreatAsRegex) = &quot;1&quot; Then
+	bTreatAsRegex = CheckEPIRegexSupport(fso, objShell, strDestFilePath)
+End If
+strFileNameIn = UTF8Decode(&quot;||fileName||&quot;)
+strHashIn = UTF8Decode(&quot;||fileMD5Hash||&quot;)
+strHashSHA1In = UTF8Decode(&quot;||fileSHA1Hash||&quot;)
+strHashSHA256In = UTF8Decode(&quot;||fileSHA256Hash||&quot;)
+
+&#x27;strTreatAsRegex = UTF8Decode(&quot;&quot;)
+strDirectoryPathIn = UTF8Decode(&quot;&quot;)
+&#x27;strFileNameIn = UTF8Decode(&quot;*calc.exe&quot;)
+&#x27;strSizeIn = UTF8Decode(&quot;&quot;)
+&#x27;strHashIn = UTF8Decode(&quot;&quot;)
+&#x27;strHashSHA1In = UTF8Decode(&quot;&quot;)
+&#x27;strHashSHA256In = UTF8Decode(&quot;&quot;)
+strMagicNumberIn = UTF8Decode(&quot;&quot;)
+strLimitIn = UTF8Decode(&quot;10&quot;)
+
+
+strDirectoryPath = GenerateValidQueryInput(strDirectoryPathIn,&quot;*&quot;)
+strFileName = GenerateValidQueryInput(strFileNameIn,&quot;*&quot;)
+strSize = GenerateValidQueryInput(strSizeIn,&quot;*&quot;)
+strHash = GenerateValidQueryInput(strHashIn,&quot;*&quot;)
+strHashSHA1 = GenerateValidQueryInput(strHashSHA1In,&quot;*&quot;)
+strHashSHA256 = GenerateValidQueryInput(strHashSHA256In,&quot;*&quot;)
+strMagicNumber = GenerateValidQueryInput(strMagicNumberIn,&quot;*&quot;)
+strLimit  = GenerateValidQueryInput(strLimitIn,strLimit)
+
+
+strUrlArg=&quot; --url-encode-output&quot;
+strOptionalArg=&quot;&quot;
+If CheckEPIArgSupport(fso, objShell, strDestFilePath, strUrlArg)Then
+	strOptionalArg=strUrlArg
+End If
+execed=ExeEPI(fso,objShell, strDestFilePath, strDirectoryPath, strFileName, strSize, strHash, strMagicNumber, strLimit, strOptionalArg)
+
+Function ExeEPI(ByRef fso, ByRef objShell, ByVal strDestFilePath,ByVal strDirectoryPath, ByVal strFileName,ByVal strSize,ByVal strHash,ByVal strMagicNumber,ByVal strLimit,ByVal strOptionalArg)
+	ExeEPI=False
+	If (fso.FileExists(strDestFilePath))Then
+		Dim oExec,strCmd,strOutput,strSelect,strParams,strlines,item,strfullPath,strOutputHash,strParse
+		strSelect = &quot;SELECT path || &#x27;\&#x27; || name as FileName, MD5, SHA1, SHA256 FROM vFiles WHERE&quot;
+		strSelect = strSelect &amp; &quot; FileId &gt; 0&quot;
+
+		call RemoveTrailingBackslashFromDir(strDirectoryPath)
+		If bTreatAsRegex Then
+			&#x27; Special prefix means we&#x27;ll be using regular expressions, and therefore
+			&#x27; may need the &#x27;|&#x27; character inside actual parameter values.
+			&#x27; Use double pipes as the separator.
+			strParams=&quot;@regex&quot;
+			call AppendWhereRegex(strSelect,strParams,&quot;Path&quot;,strDirectoryPath,&quot;||&quot;)
+			call AppendWhereRegex(strSelect,strParams,&quot;Name&quot;,strFileName,&quot;||&quot;)
+			call AppendWhereRegex(strSelect,strParams,&quot;Size&quot;,strSize,&quot;||&quot;)
+			call AppendWhereRegex(strSelect,strParams,&quot;MD5&quot;,strHash,&quot;||&quot;)
+			call AppendWhereRegex(strSelect,strParams,&quot;SHA1&quot;,strHashSHA1,&quot;||&quot;)
+			call AppendWhereRegex(strSelect,strParams,&quot;SHA256&quot;,strHashSHA256,&quot;||&quot;)
+			call AppendWhereRegex(strSelect,strParams,&quot;MagicNumber&quot;,strMagicNumber,&quot;||&quot;)
+		Else
+			If IsSpecialDirectoryGlob(strDirectoryPath) Then
+				call AppendSpecialDirectoryGlob(strSelect,strParams,&quot;Path&quot;,strDirectoryPath)
+			Else
+				call AppendWhereGlob(strSelect,strParams,&quot;Path&quot;,strDirectoryPath)
+			End If
+			call AppendWhereGlob(strSelect,strParams,&quot;Name&quot;,strFileName)
+			call AppendWhereGlob(strSelect,strParams,&quot;Size&quot;,strSize)
+			call AppendWhereGlob(strSelect,strParams,&quot;MD5&quot;,strHash)
+			call AppendWhereGlob(strSelect,strParams,&quot;SHA1&quot;,strHashSHA1)
+			call AppendWhereGlob(strSelect,strParams,&quot;SHA256&quot;,strHashSHA256)
+			call AppendWhereGlob(strSelect,strParams,&quot;MagicNumber&quot;,strMagicNumber)
+		End If
+
+		strSelect = strSelect &amp; &quot; LIMIT &quot; &amp; strLimit
+
+		strCmd=Chr(34)&amp; strDestFilePath &amp;Chr(34)&amp; strOptionalArg &amp; &quot; -psescape &quot; &amp;Chr(34)&amp; &quot;^&quot; &amp;Chr(34)&amp; &quot; -psprep &quot; &amp;Chr(34)&amp; strSelect &amp;Chr(34)&amp; &quot; -psparams &quot; &amp;Chr(34)&amp; strParams &amp;Chr(34)
+		set oExec = TaniumExec(strCmd, False, 55, &quot;&quot;, strExecWrapper, &quot;&quot;)
+		strOutput = strOutput &amp; oExec.StdOut.ReadAll
+		
+		strlines = split(strOutput,vbCrLf)
+		for each item in strlines			
+				Dim fullline, strVersion, fso2, opath, omd5 , osha1,osha256,oversion,outputall
+				if item &lt;&gt; Empty or item &lt;&gt; Null then 
+					fullline = split(item,&quot;|&quot;)
+					opath = Replace(UTF8Decode(fullline(0)), Chr(13), vbnullstring)
+					omd5 = Replace(UTF8Decode(fullline(1)), Chr(13), vbnullstring)
+					osha1 = Replace(UTF8Decode(fullline(2)), Chr(13), vbnullstring)
+					osha256 = Replace(UTF8Decode(fullline(3)), Chr(13), vbnullstring)
+					Set FSO2 = CreateObject(&quot;Scripting.FileSystemObject&quot;)
+					oversion = fso2.GetFileVersion(opath)
+					wscript.echo opath &amp; &quot;|&quot; &amp; omd5 &amp; &quot;|&quot; &amp; osha1 &amp; &quot;|&quot; &amp; osha256 &amp; &quot;|&quot; &amp; oversion
+        			
+				end if 
+		next
+		ExeEPI=True
+	Else
+		WScript.Echo &quot;Error: Could not find Tanium Endpoint Index&quot;
+	End If
+End Function
+&#x27;------------ INCLUDES after this line. Do not edit past this point -----
+&#x27;- Begin file: utils&#x2F;settings&#x2F;GetClientDir.vbs
+&#x27; Returns the directory of the client
+&#x27; Note:  GetClientDir always returns ending with a \
+&#x27; To include this file, copy&#x2F;paste: INCLUDE=utils&#x2F;settings&#x2F;GetClientDir.vbs
+
+
+Function GetClientDir()
+	Dim strResult
+	
+	strResult = GetEnvironmentValue(&quot;TANIUM_CLIENT_ROOT&quot;)
+	
+	If IsNull(strResult) Then 
+		Dim objSh
+		strResult = &quot;&quot;
+		Set objSh = CreateObject(&quot;WScript.Shell&quot;)
+	
+		On Error Resume Next
+		If strResult=&quot;&quot; Then strResult=Eval(&quot;objSh.RegRead(&quot;&quot;HKLM\Software\Tanium\Tanium Client\Path&quot;&quot;)&quot;) : Err.Clear
+		If strResult=&quot;&quot; Then strResult=Eval(&quot;objSh.RegRead(&quot;&quot;HKLM\Software\Wow6432Node\Tanium\Tanium Client\Path&quot;&quot;)&quot;) : Err.Clear
+		If strResult=&quot;&quot; Then Err.Clear
+		On Error Goto 0
+	End If
+	
+	If strResult=&quot;&quot; Then Call fRaiseError(5, &quot;GetClientDir&quot;, _
+		&quot;TSE-Error:Can not locate client directory&quot;, False)
+		
+	If Right(strResult, 1) &lt;&gt; &quot;\&quot; Then strResult = strResult &amp; &quot;\&quot;
+
+	GetClientDir = strResult
+End Function
+&#x27;- End file: utils&#x2F;settings&#x2F;GetClientDir.vbs
+&#x27;- Begin file: utils&#x2F;RaiseError.vbs
+&#x27; To include this file, copy&#x2F;paste: INCLUDE=utils&#x2F;RaiseError.vbs
+
+Function fRaiseError(errCode, errSource, errorMsg, RaiseError)
+    If RaiseError Then
+      On Error Resume Next
+      Call Err.Raise(errCode, errSource, errorMsg)
+      Exit Function
+    Else
+      WScript.Echo errorMsg
+      Wscript.Quit
+    End If
+End Function
+&#x27;- End file: utils&#x2F;RaiseError.vbs
+&#x27;- Begin file: utils&#x2F;os&#x2F;GetEnvironmentValue.vbs
+&#x27; Returns the passed in environment variable value.
+&#x27; Returns either the value as set in the environment, or Null if not set
+
+&#x27; To include this file, copy&#x2F;paste: INCLUDE=utils&#x2F;os&#x2F;GetEnvironmentValue.vbs
+
+
+Function GetEnvironmentValue(strName) 
+	Dim objShell, strSub, strResult
+	Set objShell = CreateObject(&quot;WScript.Shell&quot;)
+	strSub = &quot;%&quot; &amp; strName &amp; &quot;%&quot;
+	strResult = objShell.ExpandEnvironmentStrings(strSub)
+	
+	If strResult = strSub Then 
+		GetEnvironmentValue = Null
+	Else 
+		GetEnvironmentValue = strResult
+	End If
+End Function &#x27; GetEnvironmentValue
+&#x27;- End file: utils&#x2F;os&#x2F;GetEnvironmentValue.vbs
+&#x27;- Begin file: i18n&#x2F;UTF8Decode.vbs
+&#x27;========================================
+&#x27; UTF8Decode
+&#x27;========================================
+&#x27; Used to convert the UTF-8 style parameters passed from 
+&#x27; the server to sensors in sensor parameters.
+&#x27; This function should be used to safely pass non english input to sensors.
+
+&#x27; To include this file, copy&#x2F;paste: INCLUDE=i18n&#x2F;UTF8Decode.vbs
+
+
+Function UTF8Decode(str)
+    Dim arraylist(), strLen, i, sT, val, depth, sR
+    Dim arraysize
+    arraysize = 0
+    strLen = Len(str)
+    for i = 1 to strLen
+        sT = mid(str, i, 1)
+        if sT = &quot;%&quot; then
+            if i + 2 &lt;= strLen then
+                Redim Preserve arraylist(arraysize + 1)
+                arraylist(arraysize) = cbyte(&quot;&amp;H&quot; &amp; mid(str, i + 1, 2))
+                arraysize = arraysize + 1
+                i = i + 2
+            end if
+        else
+            Redim Preserve arraylist(arraysize + 1)
+            arraylist(arraysize) = asc(sT)
+            arraysize = arraysize + 1
+        end if
+    next
+    depth = 0
+    for i = 0 to arraysize - 1
+		Dim mybyte
+        mybyte = arraylist(i)
+        if mybyte and &amp;h80 then
+            if (mybyte and &amp;h40) = 0 then
+                if depth = 0 then
+                    Err.Raise 5
+                end if
+                val = val * 2 ^ 6 + (mybyte and &amp;h3f)
+                depth = depth - 1
+                if depth = 0 then
+                    sR = sR &amp; chrw(val)
+                    val = 0
+                end if
+            elseif (mybyte and &amp;h20) = 0 then
+                if depth &gt; 0 then Err.Raise 5
+                val = mybyte and &amp;h1f
+                depth = 1
+            elseif (mybyte and &amp;h10) = 0 then
+                if depth &gt; 0 then Err.Raise 5
+                val = mybyte and &amp;h0f
+                depth = 2
+            else
+                Err.Raise 5
+            end if
+        else
+            if depth &gt; 0 then Err.Raise 5
+            sR = sR &amp; chrw(mybyte)
+        end if
+    next
+    if depth &gt; 0 then Err.Raise 5
+    UTF8Decode = sR
+End Function
+&#x27;- End file: i18n&#x2F;UTF8Decode.vbs
+&#x27;- Begin file: index&#x2F;AppendWhereGlob.vbs
+Sub AppendWhereGlob(ByRef strSelect, ByRef strParams, ByVal columnName, ByVal columnVal)
+	If (StrComp(&quot;*&quot;, columnVal) &lt;&gt; 0) Then
+		strSelect = strSelect &amp; &quot; AND &quot; &amp; columnName &amp; &quot; LIKE ?&quot;
+		If Len(strParams) &lt;&gt; 0  Then
+			strParams = strParams + &quot;|&quot;
+		End If
+		strParams = strParams + GlobToLike(columnVal)
+	End If
+End Sub
+
+Sub AppendWhereRegex(ByRef strSelect, ByRef strParams, ByVal columnName, ByVal columnVal, ByVal delimVal)
+	If Len(columnVal) &gt; 0 Then
+		If (StrComp(&quot;*&quot;, columnVal) &lt;&gt; 0) Then
+			If (StrComp(&quot;.*&quot;, columnVal) &lt;&gt; 0) Then
+				strSelect = strSelect &amp; &quot; AND &quot; &amp; columnName &amp; &quot; REGEXP ?&quot;
+				strParams = strParams + delimVal
+				strParams = strParams + Replace(columnVal, &quot;^&quot;, &quot;^^&quot;)
+			End If
+		End If
+	End If
+End Sub
+
+Sub AppendSpecialDirectoryGlob(ByRef strSelect, ByRef strParams, ByVal columnName, ByVal columnVal)
+	&#x27; Strip off the trailing &quot;\*&quot; from the columnVal
+	Dim bareDirectoryVal
+	bareDirectoryVal = Left(columnVal, Len(columnVal) - 2)
+	strSelect = strSelect &amp; &quot; AND (&quot; &amp; columnName &amp; &quot; = ? OR &quot; &amp; columnName &amp; &quot; LIKE ?)&quot; 
+	If Len(strParams) &gt; 0  Then
+		strParams = strParams + &quot;|&quot;
+	End If
+	&#x27; Add two parameter values, one for &#x27;bare&#x27; directory path, and one with
+	&#x27; the trailing &quot;slash-star&quot; wildcard
+	strParams = strParams &amp; bareDirectoryVal &amp; &quot;|&quot;
+	strParams = strParams + GlobToLike(columnVal)
+End Sub
+
+Sub AppendTimeSlice(ByRef strSelect, ByRef strParams, ByVal columnVal)
+  strSelect = strSelect &amp; &quot; AND (Created &gt; ? OR Modified &gt; ?)&quot;
+  If Len(strParams) &lt;&gt; 0  Then
+    strParams = strParams + &quot;|&quot;
+  End If
+  strParams = strParams + CStr(columnVal) + &quot;|&quot; + CStr(columnVal)
+End Sub
+
+Sub AppendTimeSliceRegex(ByRef strSelect, ByRef strParams, ByVal columnVal, ByVal delimVal)
+  strSelect = strSelect &amp; &quot; AND (Created &gt; ? OR Modified &gt; ?)&quot;
+	strParams = strParams + delimVal + CStr(columnVal) + delimVal + CStr(columnVal)
+End Sub
+
+Function IsSpecialDirectoryGlob(ByVal strDirectoryParam)
+	&#x27; Regex search to see if directory parameter is something like
+	&#x27; C:\Users\*
+	&#x27; Where a trailing slash is followed by the star wildcard
+	Dim specialRx
+	Set specialRx = New RegExp
+	specialRx.Global = True
+	specialRx.IgnoreCase = True
+	specialRx.Pattern = &quot;^([A-Z]:\\[^\*\?]+)\\\*$&quot;
+	IsSpecialDirectoryGlob = specialRx.Test(strDirectoryParam)
+End Function
+
+Function GlobToLike(byVal strGlob)
+	GlobToLike = strGlob
+	GlobToLike = Replace(GlobToLike, &quot;^&quot;, &quot;^^&quot;)
+	GlobToLike = Replace(GlobToLike, &quot;*&quot;, &quot;^%&quot;)
+	GlobToLike = Replace(GlobToLike, &quot;?&quot;, &quot;_&quot;)
+End Function
+&#x27;- End file: index&#x2F;AppendWhereGlob.vbs
+&#x27;- Begin file: index&#x2F;GenerateValidQueryInput.vbs
+Function GenerateValidQueryInput(ByVal strIn, ByVal strDefaultValue)
+	If Len(strIn) = 0 Then
+		If Len(strDefaultValue) = 0 Then
+			GenerateValidQueryInput=&quot;*&quot;
+		Else
+			GenerateValidQueryInput=strDefaultValue
+		End If
+	Else
+		GenerateValidQueryInput = strIn
+	End If
+End Function
+
+Function GenerateValidRegexInput(ByVal strIn, ByVal strDefaultValue)
+	If Len(strIn) = 0 Then
+		If Len(strDefaultValue) = 0 Then
+			GenerateValidRegexInput=&quot;.+&quot;
+		Else
+			GenerateValidRegexInput=strDefaultValue
+		End If
+	Else
+		GenerateValidRegexInput = strIn
+	End If
+End Function
+&#x27;- End file: index&#x2F;GenerateValidQueryInput.vbs
+&#x27;- Begin file: index&#x2F;RemoveTrailingBackslashFromDir.vbs
+Sub RemoveTrailingBackslashFromDir(ByRef strDirectoryPath)
+	Dim strDirectoryPathLen
+
+	strDirectoryPathLen = Len(strDirectoryPath)
+	If strDirectoryPathLen &gt; 1 Then
+		If Right(strDirectoryPath, 1) = &quot;\&quot; Then
+			strDirectoryPath = Left(strDirectoryPath, Len(strDirectoryPath)-1)
+		End If
+	End If
+End Sub
+&#x27;- End file: index&#x2F;RemoveTrailingBackslashFromDir.vbs
+&#x27;- Begin file: index&#x2F;CheckEPIArgSupport.vbs
+Function CheckEPIArgSupport(ByRef fso, ByRef objShell, ByVal strDestFilePath, ByVal strOptionalArg)
+	CheckEPIArgSupport=False
+	If (fso.FileExists(strDestFilePath))Then
+		Dim strCmd,strErrorCode
+
+		strCmd=Chr(34)&amp;strDestFilePath&amp;Chr(34)&amp; strOptionalArg &amp; &quot; -v&quot;
+		strErrorCode = objShell.Run(strCmd,0,True) &#x27;&#x27; @SKIP_VBS_CHECK
+		If (strErrorCode=&quot;0&quot;)Then
+			CheckEPIArgSupport=True
+		End If
+	End If
+End Function
+
+Function CheckEPIRegexSupport(ByRef fso, ByRef objShell, ByVal strDestFilePath)
+	CheckEPIRegexSupport=CheckEPIArgSupport(fso, objShell, strDestFilePath, &quot;--regex-search&quot;)
+End Function
+&#x27;- End file: index&#x2F;CheckEPIArgSupport.vbs
+&#x27;- Begin file: exec&#x2F;TaniumExec.vbs
+
+&#x27; To include this file, copy&#x2F;paste: INCLUDE=exec&#x2F;TaniumExec.vbs
+
+Function TaniumExec(Command_, RaiseError, Timeout, LogLevel, ExePath, RedirectOutput)
+  &#x27;Wraps and executes the Command_ via ExePath using Wscript.Shell.Exec(strCommand)
+  &#x27;
+  &#x27;Arguments:
+  &#x27;  Command_ (string): Command and arguments to run
+  &#x27;  RaiseError (boolean): If True, raise an error when an error is encountered. Otherwise, just print an error message and quit
+  &#x27;  Timeout (int): Timeout in seconds (Default = 45)
+  &#x27;  LogLevel (string): Log level (Default = &quot;error&quot;)
+  &#x27;  ExePath (string): Path to wrappper exe use (Default = GetClientDir() &amp; &quot;Tools\StdUtils\TaniumExecWrapper.exe&quot;)
+  &#x27;  RedirectOutput (String or Array(2)): Path to redirect stdout if a non-empty String, or paths to stdout and stderr if an Array(2)
+  &#x27;Returns:
+  &#x27;  Execution results object
+  If Timeout = &quot;&quot; Then Timeout = 45
+  Dim strCommand: strCommand = TExecHelper(Command_, RaiseError, Timeout, LogLevel, ExePath, RedirectOutput)
+  Set TaniumExec = (new MockWshScriptExec)(strCommand)
+
+  &#x27; ExitCode = 10 is encountered when the timeout is reaching, causing TaniumExecWrapper to kill the process
+  If TaniumExec.ExitCode = 10 Then
+    Dim errorMsg: errorMsg = &quot;Timeout limit of &quot; &amp; Timeout &amp; &quot; second(s) reached and the process was killed: &quot; &amp; strCommand
+    If RaiseError Then
+      On Error Resume Next
+      Call Err.Raise(6, &quot;TaniumExec&quot;, errorMsg)   &#x27;6 = &quot;Overflow&quot; Error Code
+      Exit Function
+    Else
+      WScript.Echo errorMsg
+      Wscript.Quit
+    End If
+  End If
+End Function &#x27;TaniumExec
+&#x27;- End file: exec&#x2F;TaniumExec.vbs
+&#x27;- Begin file: exec&#x2F;TExecHelper.vbs
+
+&#x27; To include this file, copy&#x2F;paste: INCLUDE=exec&#x2F;TExecHelper.vbs
+
+Function TExecHelper(Command_, RaiseError, Timeout, LogLevel, ExePath, RedirectOutput)
+  &#x27;Builds a command string intended to be executed via Wscript.Shell.Exec or Wscript.Shell.Run
+  &#x27;
+  &#x27;Arguments:
+  &#x27;  Command_ (string): Command and arguments to run
+  &#x27;  RaiseError (boolean): If True, raise an error when an error is encountered. Otherwise, just print an error message and quit
+  &#x27;  Timeout (int): Timeout in seconds (Default = 45)
+  &#x27;  LogLevel (string): Log level (Default = &quot;error&quot;)
+  &#x27;  ExePath (string): Path to wrappper exe use (Default = GetClientDir() &amp; &quot;Tools\StdUtils\TaniumExecWrapper.exe&quot;)
+  &#x27;  RedirectOutput (String or Array(2)): Path to redirect stdout if a non-empty String, or paths to stdout and stderr if an Array(2)
+  &#x27;Returns:
+  &#x27;  A command string
+  Dim objFSO: Set objFSO = CreateObject(&quot;Scripting.FileSystemObject&quot;)
+
+  If ExePath = &quot;&quot; Then ExePath = GetClientDir() &amp; &quot;Tools\StdUtils\TaniumExecWrapper.exe&quot;
+
+  If Not objFSO.FileExists(ExePath) Then
+    Call fRaiseError(53, &quot;TExecHelper&quot;, &quot;Standard Utilities Missing: &quot; &amp; ExePath, RaiseError)
+    &#x27;53 = &quot;File not found&quot; Error Code
+  End If
+
+  &#x27;Set default values if not defined
+  If Timeout = &quot;&quot; Then Timeout = 45
+  If LogLevel = &quot;&quot; Then LogLevel = &quot;error&quot;
+
+  Dim strCommand
+  strCommand = Chr(34) &amp; ExePath &amp; Chr(34)
+  strCommand = strCommand &amp; &quot; --timeout &quot; &amp; Timeout
+  strCommand = strCommand &amp; &quot; --loglevel &quot; &amp; LogLevel
+
+  Dim valid: valid = False
+  If TypeName(RedirectOutput) = &quot;String&quot; Then
+    If Not RedirectOutput = &quot;&quot; Then strCommand = strCommand &amp; &quot; --stdout-to &quot;&quot;&quot; &amp; RedirectOutput &amp; Chr(34)
+    valid = True
+  ElseIf TypeName(RedirectOutput) = TypeName(Array()) Then
+    If UBound(RedirectOutput) = 1 Then
+      If Not RedirectOutput(0) = &quot;&quot; Then strCommand = strCommand &amp; &quot; --stdout-to &quot;&quot;&quot; &amp; RedirectOutput(0) &amp; Chr(34)
+      If Not RedirectOutput(1) = &quot;&quot; Then strCommand = strCommand &amp; &quot; --stderr-to &quot;&quot;&quot; &amp; RedirectOutput(1) &amp; Chr(34)
+      valid = True
+    End If
+  ElseIf RedirectOutput = False Then
+    valid = True
+  End If
+
+  If Not valid Then
+    Call fRaiseError(5, &quot;TExecHelper&quot;, _
+      &quot;RedirectOutput argument to TExecHelper must be a String or a Length-2 Array.&quot;, RaiseError)
+    &#x27;5 = &quot;Invalid procedure call or argument&quot; Error Code
+  End If
+
+  strCommand = strCommand &amp; &quot; -- &quot; &amp; Command_
+  TExecHelper = strCommand
+End Function &#x27;TExecHelper
+&#x27;- End file: exec&#x2F;TExecHelper.vbs
+&#x27;- Begin file: exec&#x2F;MockWshScriptExec.vbs
+
+&#x27; To include this file, copy&#x2F;paste: INCLUDE=exec&#x2F;MockWshScriptExec.vbs
+
+Class MockTextStream
+	Private text
+	Private stream_read
+
+	Public Default Function Init(stream_content)
+		Set Init = Me
+		text = stream_content
+		stream_read = False
+	End Function
+
+	Public Property Get ReadAll
+		If Not stream_read Then
+			ReadAll = text
+			stream_read = True
+		Else
+			ReadAll = &quot;&quot;
+		End If
+	End Property
+End Class
+
+Class MockWshScriptExec
+	Private stdout_: Public Property Get StdOut : Set StdOut = stdout_ : End Property
+	Private stderr_: Public Property Get StdErr : Set StdErr = stderr_ : End Property
+	Private exitcode_: Public Property Get ExitCode : ExitCode = exitcode_ : End Property
+
+	Public Default Function Init(strCommand)
+		Set Init = Me
+		Dim stdout_backer: Set stdout_backer=(new StreamBacker)(&quot;WScript.StdOut&quot;, False, True)
+		Dim stderr_backer: Set stderr_backer=(new StreamBacker)(&quot;WScript.StdErr&quot;, False, True)
+
+		Dim objShell: Set objShell = CreateObject(&quot;Wscript.Shell&quot;)
+		Dim realWshScriptExec: Set realWshScriptExec = objShell.Exec(strCommand) &#x27;&#x27; @SKIP_VBS_CHECK
+
+		Do While realWshScriptExec.Status = 0
+		    stdout_backer.drainFrom(realWshScriptExec.StdOut)
+		    stderr_backer.drainFrom(realWshScriptExec.StdErr)
+		Loop
+		stdout_backer.drainFrom(realWshScriptExec.StdOut)
+		stderr_backer.drainFrom(realWshScriptExec.StdErr)
+		stdout_backer.Stream.Position = 0
+		stderr_backer.Stream.Position = 0
+
+		Set stdout_ = (new MockTextStream)(stdout_backer.Stream.ReadText)
+		Set stderr_ = (new MockTextStream)(stderr_backer.Stream.ReadText)
+		exitcode_ = RealWshScriptExec.ExitCode
+	End Function
+End Class
+&#x27;- End file: exec&#x2F;MockWshScriptExec.vbs
+&#x27;- Begin file: exec&#x2F;StreamBacker.vbs
+&#x27; To include this file, copy&#x2F;paste: INCLUDE=exec&#x2F;StreamBacker.vbs
+
+Class StreamBacker
+    Private stream_
+    Private stdStream_
+    Public Property Get HasStdStream : HasStdStream=Not stdStream_ Is Nothing : End Property
+    Public Property Get HasSelfStream : HasSelfStream=Not stream_ Is Nothing : End Property
+    Public Property Get Stream : Set Stream=stream_ : End Property
+
+    Public Default Function Init(strName, bRedirectIfPossible, bStoreIfNotRedirected)
+        Set Init=Me
+
+        Set stdStream_ = Nothing
+
+        If bRedirectIfPossible Then
+            On Error Resume Next
+            Set stdStream_=Eval(strName)
+            If Err.Number&lt;&gt;0 Then Set stdStream_ = Nothing
+            Err.Clear
+            On Error Goto 0
+        End If
+
+        Set stream_=Nothing
+        If Not HasStdStream And bStoreIfNotRedirected Then
+            Set stream_ = CreateObject(&quot;ADODB.Stream&quot;)
+            stream_.Charset=&quot;UTF-8&quot;
+            stream_.Open
+        End If
+    End Function
+
+    Sub Class_Terminate
+        Set stream_ = Nothing
+        Set stdStream_ = Nothing
+    End Sub
+
+    Sub drainFrom(s)
+        Do While Not s.AtEndOfStream
+            Write s.Read(1024)
+        Loop
+    End Sub
+
+    Sub Write(s)
+        If HasStdStream Then
+            stdStream_.Write s
+        ElseIf HasSelfStream Then
+            stream_.WriteText s
+        End If
+    End Sub
+
+End Class
+&#x27;- End file: exec&#x2F;StreamBacker.vbs
+&#x27;======================================================
+
+
+
+&#x27; Copyright 2020, Tanium Inc.</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>6</sensor_type>
+                <os>1</os>
+                <query>#!&#x2F;bin&#x2F;bash
+
+echo &quot;N&#x2F;A on Linux&quot;
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>6</sensor_type>
+                <os>2</os>
+                <query>#!&#x2F;bin&#x2F;sh
+
+echo &quot;N&#x2F;A on Mac&quot;
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>6</sensor_type>
+                <os>3</os>
+                <query>#!&#x2F;bin&#x2F;sh
+
+# Copyright 2020, Tanium Inc.
+# THIS IS A STUB - NOT INTENDED AS FUNCTIONAL - NA
+# 
+# ||treatInputAsRegex||  ||directoryPath||  ||fileName||  ||fileSize||  ||fileMD5Hash||  ||fileSHA1Hash||  ||fileSHA256Hash||  ||magicNumber||  ||limit||  
+
+echo &quot;N&#x2F;A on Solaris&quot;
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>6</sensor_type>
+                <os>4</os>
+                <query>#!&#x2F;bin&#x2F;sh
+
+# Copyright 2020, Tanium Inc.
+# THIS IS A STUB - NOT INTENDED AS FUNCTIONAL - NA
+# 
+# ||treatInputAsRegex||  ||directoryPath||  ||fileName||  ||fileSize||  ||fileMD5Hash||  ||fileSHA1Hash||  ||fileSHA256Hash||  ||magicNumber||  ||limit||  
+
+echo &quot;N&#x2F;A on AIX&quot;
+</query>
+                <signature></signature>
+            </sensor_query>
+        </queries>
+        <columns>
+            <column>
+                <column_index>0</column_index>
+                <name>File path</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>1</column_index>
+                <name>File MD5 Hash</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>2</column_index>
+                <name>File SHA1 Hash</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>3</column_index>
+                <name>File SHA256 Hash</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>4</column_index>
+                <name>File Version</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+        </columns>
+        <meta_data>
+            <meta_data_item>
+                <name>TANIUMCONTENT_description.en</name>
+                <value>The Index Query File Path and Hash sensor supports supports both wildcards and regular expressions in parameters with the exception of the Maximum Number of Rows. Supported wildcard syntax includes the * character to match any number of characters and the ? character to match one character. For example, you can use *pad.exe to search for either notepad.exe or wordpad.exe. To use regular expressions in parameter values, make sure the Use Regular Expressions check box is selected. You can use regular expressions to search for more complex patterns and to further constrain the scope of the search. For example, specifying &quot;C:\Program Files*\Tanium\*&quot; as the Directory Path parameter and specifying &quot;*.exe&quot; as the File Name parameter searches for all executables located under the Tanium directory in either &quot;Program Files&quot; or &quot;Program Files (x86)&quot; on the C: drive.</value>
+                <admin_flag>0</admin_flag>
+            </meta_data_item>
+        </meta_data>
+        <content_set>
+            <name>Default</name>
+            <description></description>
+            <reserved_name>default</reserved_name>
+            <meta_data/>
+        </content_set>
+    </sensor>
+</content>

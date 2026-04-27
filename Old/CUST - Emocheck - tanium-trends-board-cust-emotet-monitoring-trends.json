@@ -1,0 +1,826 @@
+﻿{
+  "formatVersion": 3,
+  "contentType": "Tanium Trends2 Exporter",
+  "createdAt": "2020-10-12T11:56:59.811Z",
+  "query": {
+    "Boards": [
+      {
+        "id": 32,
+        "Sections": [
+          {
+            "id": 86,
+            "Panels": [
+              {
+                "id": 257
+              },
+              {
+                "id": 258
+              },
+              {
+                "id": 259
+              }
+            ]
+          }
+        ],
+        "ContentSet": {
+          "name": "Trends"
+        }
+      }
+    ],
+    "Sources": false,
+    "boardContentSetId": 0,
+    "sourceContentSetId": 0
+  },
+  "response": {
+    "Boards": [
+      {
+        "id": 32,
+        "name": "CUST - Emotet Monitoring Trends",
+        "description": "",
+        "defaultGroupId": -1,
+        "contentSetId": 34,
+        "createdAt": "2020-10-12T11:35:44.095Z",
+        "updatedAt": "2020-10-12T11:37:07.824Z",
+        "Sections": [
+          {
+            "id": 86,
+            "boardId": 32,
+            "sortRank": -1,
+            "name": "EI - Emotet Monitoring Default Section",
+            "description": null,
+            "footer": null,
+            "isDefault": true,
+            "createdAt": "2020-09-22T07:29:21.569Z",
+            "updatedAt": "2020-09-22T07:29:21.569Z",
+            "BoardId": 32,
+            "Panels": [
+              {
+                "id": 257,
+                "sectionId": 86,
+                "sourceId": 137,
+                "sortRank": 0,
+                "name": "Emotet infections status",
+                "description": "",
+                "defaultGroupId": 1,
+                "defaultBackgroundColor": null,
+                "field": "Emocheck Scan Result",
+                "value": null,
+                "chartType": "area",
+                "axisFontSize": null,
+                "customDateRangeStart": null,
+                "customDateRangeEnd": null,
+                "displayRows": null,
+                "labelOrder": null,
+                "dateRangeId": 12,
+                "countStrategyId": 2,
+                "selectedItems": null,
+                "seriesSortOrder": "descending",
+                "seriesSortKey": "result",
+                "itemColors": {
+                  "False": "#4DAE09",
+                  "True": "#D0021B"
+                },
+                "valueFormat": null,
+                "xAxisLabel": null,
+                "yAxisLabel": null,
+                "displayWidth": "full",
+                "yScale": "linear",
+                "fields": null,
+                "values": null,
+                "interval": null,
+                "filter": null,
+                "createdAt": "2020-09-22T07:32:41.138Z",
+                "updatedAt": "2020-10-12T11:45:30.023Z",
+                "SectionId": 86,
+                "SourceId": 137,
+                "PanelColorThresholds": [],
+                "Source": {
+                  "id": 137,
+                  "name": "CUST - Emocheck Summary",
+                  "description": "",
+                  "enabled": true,
+                  "collectionSchedule": "35 */4 * * *",
+                  "type": "SavedQuestion",
+                  "configuration": {
+                    "name": "Trends CUST - Emocheck Summary",
+                    "query_text": "Get?forceComputerIdFlag=1 CUST - Emocheck from all machines",
+                    "keep_seconds": 18480,
+                    "selects": [
+                      {
+                        "sensor": {
+                          "id": 2468,
+                          "name": "CUST - Emocheck",
+                          "content_set": {
+                            "id": 2,
+                            "name": "Default"
+                          },
+                          "string_count": 18,
+                          "category": "Default",
+                          "description": "Sensor parsing output from Emocheck tool to check the presence of Banking Trojan.\n\nhttps://github.com/JPCERTCC/EmoCheck\n\nSee https://en.wikipedia.org/wiki/Emotet\n\nWorks with Packages same name (x86 or x64)",
+                          "source_id": 0,
+                          "value_type": "String",
+                          "max_age_seconds": 900,
+                          "ignore_case_flag": 1,
+                          "delimiter": "|",
+                          "creation_time": "2020-10-12T11:05:56",
+                          "modification_time": "2020-10-12T11:25:49",
+                          "last_modified_by": "tanium",
+                          "mod_user": {
+                            "id": 1,
+                            "name": "tanium",
+                            "omitBlacklist": [
+                              "roles",
+                              "effective_group_id",
+                              "content_set_roles",
+                              "effective_content_set_privileges",
+                              "owned_object_ids"
+                            ]
+                          },
+                          "hidden_flag": 0,
+                          "keep_duplicates_flag": 0,
+                          "subcolumns": [
+                            {
+                              "name": "Emocheck Scan Date",
+                              "index": 0,
+                              "value_type": "BESDate",
+                              "ignore_case_flag": 1,
+                              "hidden_flag": 0
+                            },
+                            {
+                              "name": "Emocheck Scan Time",
+                              "index": 1,
+                              "value_type": "BESDate",
+                              "ignore_case_flag": 1,
+                              "hidden_flag": 0
+                            },
+                            {
+                              "name": "Emocheck Scan Result",
+                              "index": 2,
+                              "value_type": "String",
+                              "ignore_case_flag": 1,
+                              "hidden_flag": 0
+                            },
+                            {
+                              "name": "Process Infected by Emotet",
+                              "index": 3,
+                              "value_type": "String",
+                              "ignore_case_flag": 1,
+                              "hidden_flag": 0
+                            },
+                            {
+                              "name": "Process Location",
+                              "index": 4,
+                              "value_type": "String",
+                              "ignore_case_flag": 1,
+                              "hidden_flag": 0
+                            }
+                          ]
+                        },
+                        "filter": {
+                          "max_age_seconds": 900
+                        }
+                      }
+                    ],
+                    "group": null
+                  },
+                  "options": {
+                    "optionsRecentResultBuckets": 86400
+                  },
+                  "module": "Trends",
+                  "clientUid": "",
+                  "contentSetId": 34,
+                  "managed": null,
+                  "createdAt": "2020-10-12T11:38:55.370Z",
+                  "updatedAt": "2020-10-12T11:38:55.370Z",
+                  "ContentSet": {
+                    "id": 34,
+                    "name": "Trends",
+                    "description": "Default content set for Trends boards, sources, and saved questions.",
+                    "reserved_name": "Trends",
+                    "metadata": [
+                      {
+                        "name": "TConsole.ContentSet.FixedName",
+                        "value": "true",
+                        "admin_flag": 0,
+                        "omitBlacklist": [],
+                        "omitWhitelist": []
+                      },
+                      {
+                        "name": "TConsole.ContentSet.FixedContent",
+                        "value": "false",
+                        "admin_flag": 0,
+                        "omitBlacklist": [],
+                        "omitWhitelist": []
+                      }
+                    ],
+                    "omitBlacklist": [],
+                    "omitWhitelist": []
+                  },
+                  "hasContentSet": true
+                },
+                "sourceType": "SavedQuestion",
+                "defaultGroupName": "All Computers"
+              },
+              {
+                "id": 258,
+                "sectionId": 86,
+                "sourceId": 137,
+                "sortRank": 100,
+                "name": "Number of checks per days",
+                "description": "",
+                "defaultGroupId": 1,
+                "defaultBackgroundColor": null,
+                "field": "Emocheck Scan Date",
+                "value": null,
+                "chartType": "verticalBar",
+                "axisFontSize": null,
+                "customDateRangeStart": null,
+                "customDateRangeEnd": null,
+                "displayRows": 50,
+                "labelOrder": null,
+                "dateRangeId": 1,
+                "countStrategyId": 2,
+                "selectedItems": [
+                  {
+                    "key": "2020-02-10",
+                    "value": true
+                  },
+                  {
+                    "key": "2020-09-21",
+                    "value": true
+                  },
+                  {
+                    "key": "2020-09-22",
+                    "value": true
+                  },
+                  {
+                    "key": "2020-10-12",
+                    "value": true
+                  },
+                  {
+                    "key": "N/A on Linux",
+                    "value": false
+                  },
+                  {
+                    "key": "N/A on Mac",
+                    "value": false
+                  }
+                ],
+                "seriesSortOrder": "ascending",
+                "seriesSortKey": "name",
+                "itemColors": {
+                  "2020-02-10": "#409EB4",
+                  "2020-09-21": "#54D9F6",
+                  "2020-09-22": "#F5A623",
+                  "2020-10-12": "#FFDC73"
+                },
+                "valueFormat": null,
+                "xAxisLabel": null,
+                "yAxisLabel": null,
+                "displayWidth": "full",
+                "yScale": "linear",
+                "fields": null,
+                "values": null,
+                "interval": null,
+                "filter": null,
+                "createdAt": "2020-09-22T07:32:41.170Z",
+                "updatedAt": "2020-10-12T11:45:30.017Z",
+                "SectionId": 86,
+                "SourceId": 137,
+                "PanelColorThresholds": [],
+                "Source": {
+                  "id": 137,
+                  "name": "CUST - Emocheck Summary",
+                  "description": "",
+                  "enabled": true,
+                  "collectionSchedule": "35 */4 * * *",
+                  "type": "SavedQuestion",
+                  "configuration": {
+                    "name": "Trends CUST - Emocheck Summary",
+                    "query_text": "Get?forceComputerIdFlag=1 CUST - Emocheck from all machines",
+                    "keep_seconds": 18480,
+                    "selects": [
+                      {
+                        "sensor": {
+                          "id": 2468,
+                          "name": "CUST - Emocheck",
+                          "content_set": {
+                            "id": 2,
+                            "name": "Default"
+                          },
+                          "string_count": 18,
+                          "category": "Default",
+                          "description": "Sensor parsing output from Emocheck tool to check the presence of Banking Trojan.\n\nhttps://github.com/JPCERTCC/EmoCheck\n\nSee https://en.wikipedia.org/wiki/Emotet\n\nWorks with Packages same name (x86 or x64)",
+                          "source_id": 0,
+                          "value_type": "String",
+                          "max_age_seconds": 900,
+                          "ignore_case_flag": 1,
+                          "delimiter": "|",
+                          "creation_time": "2020-10-12T11:05:56",
+                          "modification_time": "2020-10-12T11:25:49",
+                          "last_modified_by": "tanium",
+                          "mod_user": {
+                            "id": 1,
+                            "name": "tanium",
+                            "omitBlacklist": [
+                              "roles",
+                              "effective_group_id",
+                              "content_set_roles",
+                              "effective_content_set_privileges",
+                              "owned_object_ids"
+                            ]
+                          },
+                          "hidden_flag": 0,
+                          "keep_duplicates_flag": 0,
+                          "subcolumns": [
+                            {
+                              "name": "Emocheck Scan Date",
+                              "index": 0,
+                              "value_type": "BESDate",
+                              "ignore_case_flag": 1,
+                              "hidden_flag": 0
+                            },
+                            {
+                              "name": "Emocheck Scan Time",
+                              "index": 1,
+                              "value_type": "BESDate",
+                              "ignore_case_flag": 1,
+                              "hidden_flag": 0
+                            },
+                            {
+                              "name": "Emocheck Scan Result",
+                              "index": 2,
+                              "value_type": "String",
+                              "ignore_case_flag": 1,
+                              "hidden_flag": 0
+                            },
+                            {
+                              "name": "Process Infected by Emotet",
+                              "index": 3,
+                              "value_type": "String",
+                              "ignore_case_flag": 1,
+                              "hidden_flag": 0
+                            },
+                            {
+                              "name": "Process Location",
+                              "index": 4,
+                              "value_type": "String",
+                              "ignore_case_flag": 1,
+                              "hidden_flag": 0
+                            }
+                          ]
+                        },
+                        "filter": {
+                          "max_age_seconds": 900
+                        }
+                      }
+                    ],
+                    "group": null
+                  },
+                  "options": {
+                    "optionsRecentResultBuckets": 86400
+                  },
+                  "module": "Trends",
+                  "clientUid": "",
+                  "contentSetId": 34,
+                  "managed": null,
+                  "createdAt": "2020-10-12T11:38:55.370Z",
+                  "updatedAt": "2020-10-12T11:38:55.370Z",
+                  "ContentSet": {
+                    "id": 34,
+                    "name": "Trends",
+                    "description": "Default content set for Trends boards, sources, and saved questions.",
+                    "reserved_name": "Trends",
+                    "metadata": [
+                      {
+                        "name": "TConsole.ContentSet.FixedName",
+                        "value": "true",
+                        "admin_flag": 0,
+                        "omitBlacklist": [],
+                        "omitWhitelist": []
+                      },
+                      {
+                        "name": "TConsole.ContentSet.FixedContent",
+                        "value": "false",
+                        "admin_flag": 0,
+                        "omitBlacklist": [],
+                        "omitWhitelist": []
+                      }
+                    ],
+                    "omitBlacklist": [],
+                    "omitWhitelist": []
+                  },
+                  "hasContentSet": true
+                },
+                "sourceType": "SavedQuestion",
+                "defaultGroupName": "All Computers"
+              },
+              {
+                "id": 259,
+                "sectionId": 86,
+                "sourceId": 138,
+                "sortRank": 200,
+                "name": "Process name infected",
+                "description": "",
+                "defaultGroupId": 1,
+                "defaultBackgroundColor": null,
+                "field": "Process Infected by Emotet",
+                "value": null,
+                "chartType": "area",
+                "axisFontSize": null,
+                "customDateRangeStart": null,
+                "customDateRangeEnd": null,
+                "displayRows": null,
+                "labelOrder": null,
+                "dateRangeId": 12,
+                "countStrategyId": 2,
+                "selectedItems": [
+                  {
+                    "key": "[no results]",
+                    "value": false
+                  },
+                  {
+                    "key": "mstask.exe",
+                    "value": true
+                  }
+                ],
+                "seriesSortOrder": "descending",
+                "seriesSortKey": "result",
+                "itemColors": {
+                  "mstask.exe": "#D0021B"
+                },
+                "valueFormat": null,
+                "xAxisLabel": null,
+                "yAxisLabel": null,
+                "displayWidth": "full",
+                "yScale": "linear",
+                "fields": null,
+                "values": null,
+                "interval": null,
+                "filter": null,
+                "createdAt": "2020-10-12T11:45:30.207Z",
+                "updatedAt": "2020-10-12T11:45:30.207Z",
+                "SectionId": 86,
+                "SourceId": 138,
+                "PanelColorThresholds": [],
+                "Source": {
+                  "id": 138,
+                  "name": "CUST - Emocheck - Process Name",
+                  "description": "",
+                  "enabled": true,
+                  "collectionSchedule": "50 */4 * * *",
+                  "type": "SavedQuestion",
+                  "configuration": {
+                    "name": "Trends CUST - Emocheck - Process Name",
+                    "query_text": "Get?forceComputerIdFlag=1 CUST - Emocheck having CUST - Emocheck:Emocheck Scan Result contains True from all machines",
+                    "keep_seconds": 19740,
+                    "selects": [
+                      {
+                        "sensor": {
+                          "id": 2468,
+                          "name": "CUST - Emocheck",
+                          "content_set": {
+                            "id": 2,
+                            "name": "Default"
+                          },
+                          "string_count": 18,
+                          "category": "Default",
+                          "description": "Sensor parsing output from Emocheck tool to check the presence of Banking Trojan.\n\nhttps://github.com/JPCERTCC/EmoCheck\n\nSee https://en.wikipedia.org/wiki/Emotet\n\nWorks with Packages same name (x86 or x64)",
+                          "source_id": 0,
+                          "value_type": "String",
+                          "max_age_seconds": 900,
+                          "ignore_case_flag": 1,
+                          "delimiter": "|",
+                          "creation_time": "2020-10-12T11:05:56",
+                          "modification_time": "2020-10-12T11:25:49",
+                          "last_modified_by": "tanium",
+                          "mod_user": {
+                            "id": 1,
+                            "name": "tanium",
+                            "omitBlacklist": [
+                              "roles",
+                              "effective_group_id",
+                              "content_set_roles",
+                              "effective_content_set_privileges",
+                              "owned_object_ids"
+                            ]
+                          },
+                          "hidden_flag": 0,
+                          "keep_duplicates_flag": 0,
+                          "subcolumns": [
+                            {
+                              "name": "Emocheck Scan Date",
+                              "index": 0,
+                              "value_type": "BESDate",
+                              "ignore_case_flag": 1,
+                              "hidden_flag": 0
+                            },
+                            {
+                              "name": "Emocheck Scan Time",
+                              "index": 1,
+                              "value_type": "BESDate",
+                              "ignore_case_flag": 1,
+                              "hidden_flag": 0
+                            },
+                            {
+                              "name": "Emocheck Scan Result",
+                              "index": 2,
+                              "value_type": "String",
+                              "ignore_case_flag": 1,
+                              "hidden_flag": 0
+                            },
+                            {
+                              "name": "Process Infected by Emotet",
+                              "index": 3,
+                              "value_type": "String",
+                              "ignore_case_flag": 1,
+                              "hidden_flag": 0
+                            },
+                            {
+                              "name": "Process Location",
+                              "index": 4,
+                              "value_type": "String",
+                              "ignore_case_flag": 1,
+                              "hidden_flag": 0
+                            }
+                          ]
+                        },
+                        "filter": {
+                          "operator": "RegexMatch",
+                          "value_type": "String",
+                          "value": ".*True.*",
+                          "not_flag": 0,
+                          "max_age_seconds": 900,
+                          "ignore_case_flag": 1,
+                          "delimiter": "|",
+                          "delimiter_index": 3
+                        }
+                      }
+                    ],
+                    "group": null
+                  },
+                  "options": {
+                    "optionsRecentResultBuckets": 86400
+                  },
+                  "module": "Trends",
+                  "clientUid": "",
+                  "contentSetId": 34,
+                  "managed": null,
+                  "createdAt": "2020-10-12T11:42:44.167Z",
+                  "updatedAt": "2020-10-12T11:42:44.167Z",
+                  "ContentSet": {
+                    "id": 34,
+                    "name": "Trends",
+                    "description": "Default content set for Trends boards, sources, and saved questions.",
+                    "reserved_name": "Trends",
+                    "metadata": [
+                      {
+                        "name": "TConsole.ContentSet.FixedName",
+                        "value": "true",
+                        "admin_flag": 0,
+                        "omitBlacklist": [],
+                        "omitWhitelist": []
+                      },
+                      {
+                        "name": "TConsole.ContentSet.FixedContent",
+                        "value": "false",
+                        "admin_flag": 0,
+                        "omitBlacklist": [],
+                        "omitWhitelist": []
+                      }
+                    ],
+                    "omitBlacklist": [],
+                    "omitWhitelist": []
+                  },
+                  "hasContentSet": true
+                },
+                "sourceType": "SavedQuestion",
+                "defaultGroupName": "All Computers"
+              }
+            ]
+          }
+        ],
+        "isFavorite": false,
+        "ContentSet": {
+          "name": "Trends"
+        },
+        "hasContentSet": true
+      }
+    ],
+    "Sources": [
+      {
+        "id": 137,
+        "name": "CUST - Emocheck Summary",
+        "description": "",
+        "enabled": true,
+        "collectionSchedule": "35 */4 * * *",
+        "type": "SavedQuestion",
+        "configuration": {
+          "name": "Trends CUST - Emocheck Summary",
+          "query_text": "Get?forceComputerIdFlag=1 CUST - Emocheck from all machines",
+          "keep_seconds": 18480,
+          "selects": [
+            {
+              "sensor": {
+                "id": 2468,
+                "name": "CUST - Emocheck",
+                "content_set": {
+                  "id": 2,
+                  "name": "Default"
+                },
+                "string_count": 18,
+                "category": "Default",
+                "description": "Sensor parsing output from Emocheck tool to check the presence of Banking Trojan.\n\nhttps://github.com/JPCERTCC/EmoCheck\n\nSee https://en.wikipedia.org/wiki/Emotet\n\nWorks with Packages same name (x86 or x64)",
+                "source_id": 0,
+                "value_type": "String",
+                "max_age_seconds": 900,
+                "ignore_case_flag": 1,
+                "delimiter": "|",
+                "creation_time": "2020-10-12T11:05:56",
+                "modification_time": "2020-10-12T11:25:49",
+                "last_modified_by": "tanium",
+                "mod_user": {
+                  "id": 1,
+                  "name": "tanium",
+                  "omitBlacklist": [
+                    "roles",
+                    "effective_group_id",
+                    "content_set_roles",
+                    "effective_content_set_privileges",
+                    "owned_object_ids"
+                  ]
+                },
+                "hidden_flag": 0,
+                "keep_duplicates_flag": 0,
+                "subcolumns": [
+                  {
+                    "name": "Emocheck Scan Date",
+                    "index": 0,
+                    "value_type": "BESDate",
+                    "ignore_case_flag": 1,
+                    "hidden_flag": 0
+                  },
+                  {
+                    "name": "Emocheck Scan Time",
+                    "index": 1,
+                    "value_type": "BESDate",
+                    "ignore_case_flag": 1,
+                    "hidden_flag": 0
+                  },
+                  {
+                    "name": "Emocheck Scan Result",
+                    "index": 2,
+                    "value_type": "String",
+                    "ignore_case_flag": 1,
+                    "hidden_flag": 0
+                  },
+                  {
+                    "name": "Process Infected by Emotet",
+                    "index": 3,
+                    "value_type": "String",
+                    "ignore_case_flag": 1,
+                    "hidden_flag": 0
+                  },
+                  {
+                    "name": "Process Location",
+                    "index": 4,
+                    "value_type": "String",
+                    "ignore_case_flag": 1,
+                    "hidden_flag": 0
+                  }
+                ]
+              },
+              "filter": {
+                "max_age_seconds": 900
+              }
+            }
+          ],
+          "group": null
+        },
+        "options": {
+          "optionsRecentResultBuckets": 86400
+        },
+        "module": "Trends",
+        "clientUid": "",
+        "contentSetId": 34,
+        "managed": null,
+        "createdAt": "2020-10-12T11:38:55.370Z",
+        "updatedAt": "2020-10-12T11:38:55.370Z",
+        "ContentSet": {
+          "name": "Trends"
+        },
+        "hasContentSet": true
+      },
+      {
+        "id": 138,
+        "name": "CUST - Emocheck - Process Name",
+        "description": "",
+        "enabled": true,
+        "collectionSchedule": "50 */4 * * *",
+        "type": "SavedQuestion",
+        "configuration": {
+          "name": "Trends CUST - Emocheck - Process Name",
+          "query_text": "Get?forceComputerIdFlag=1 CUST - Emocheck having CUST - Emocheck:Emocheck Scan Result contains True from all machines",
+          "keep_seconds": 19740,
+          "selects": [
+            {
+              "sensor": {
+                "id": 2468,
+                "name": "CUST - Emocheck",
+                "content_set": {
+                  "id": 2,
+                  "name": "Default"
+                },
+                "string_count": 18,
+                "category": "Default",
+                "description": "Sensor parsing output from Emocheck tool to check the presence of Banking Trojan.\n\nhttps://github.com/JPCERTCC/EmoCheck\n\nSee https://en.wikipedia.org/wiki/Emotet\n\nWorks with Packages same name (x86 or x64)",
+                "source_id": 0,
+                "value_type": "String",
+                "max_age_seconds": 900,
+                "ignore_case_flag": 1,
+                "delimiter": "|",
+                "creation_time": "2020-10-12T11:05:56",
+                "modification_time": "2020-10-12T11:25:49",
+                "last_modified_by": "tanium",
+                "mod_user": {
+                  "id": 1,
+                  "name": "tanium",
+                  "omitBlacklist": [
+                    "roles",
+                    "effective_group_id",
+                    "content_set_roles",
+                    "effective_content_set_privileges",
+                    "owned_object_ids"
+                  ]
+                },
+                "hidden_flag": 0,
+                "keep_duplicates_flag": 0,
+                "subcolumns": [
+                  {
+                    "name": "Emocheck Scan Date",
+                    "index": 0,
+                    "value_type": "BESDate",
+                    "ignore_case_flag": 1,
+                    "hidden_flag": 0
+                  },
+                  {
+                    "name": "Emocheck Scan Time",
+                    "index": 1,
+                    "value_type": "BESDate",
+                    "ignore_case_flag": 1,
+                    "hidden_flag": 0
+                  },
+                  {
+                    "name": "Emocheck Scan Result",
+                    "index": 2,
+                    "value_type": "String",
+                    "ignore_case_flag": 1,
+                    "hidden_flag": 0
+                  },
+                  {
+                    "name": "Process Infected by Emotet",
+                    "index": 3,
+                    "value_type": "String",
+                    "ignore_case_flag": 1,
+                    "hidden_flag": 0
+                  },
+                  {
+                    "name": "Process Location",
+                    "index": 4,
+                    "value_type": "String",
+                    "ignore_case_flag": 1,
+                    "hidden_flag": 0
+                  }
+                ]
+              },
+              "filter": {
+                "operator": "RegexMatch",
+                "value_type": "String",
+                "value": ".*True.*",
+                "not_flag": 0,
+                "max_age_seconds": 900,
+                "ignore_case_flag": 1,
+                "delimiter": "|",
+                "delimiter_index": 3
+              }
+            }
+          ],
+          "group": null
+        },
+        "options": {
+          "optionsRecentResultBuckets": 86400
+        },
+        "module": "Trends",
+        "clientUid": "",
+        "contentSetId": 34,
+        "managed": null,
+        "createdAt": "2020-10-12T11:42:44.167Z",
+        "updatedAt": "2020-10-12T11:42:44.167Z",
+        "ContentSet": {
+          "name": "Trends"
+        },
+        "hasContentSet": true
+      }
+    ]
+  }
+}

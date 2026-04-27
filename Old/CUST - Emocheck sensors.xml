@@ -1,0 +1,169 @@
+<!-- Exported using version "7_4_3_1242" on Monday, October 12, 2020 12:25:58 PM -->
+<content>
+    <sensor>
+        <name>CUST - Emocheck</name>
+        <what_hash>3880077958</what_hash>
+        <category>Default</category>
+        <description>Sensor parsing output from Emocheck tool to check the presence of Banking Trojan.
+
+https:&#x2F;&#x2F;github.com&#x2F;JPCERTCC&#x2F;EmoCheck
+
+See https:&#x2F;&#x2F;en.wikipedia.org&#x2F;wiki&#x2F;Emotet
+
+Works with Packages same name (x86 or x64)</description>
+        <result_type>1</result_type>
+        <qseconds>900</qseconds>
+        <ignore_case_flag>1</ignore_case_flag>
+        <delimiter>|</delimiter>
+        <hidden_flag>0</hidden_flag>
+        <queries>
+            <sensor_query>
+                <sensor_type>8</sensor_type>
+                <os>0</os>
+                <query>#!&#x2F;bin&#x2F;sh
+# -*- coding: utf-8 -*-
+# Version = 1.0
+# TAM - Laurent Chappe 20201005
+
+
+import tanium
+import tanium_base
+import urllib
+import os
+import sys
+import tempfile
+import re
+
+#Create list where we will store the filename found
+files = []
+
+
+suffix = &quot;_emocheck.txt&quot;
+
+#Slice the file found in 3 part (r)oot, (d)irectory and (f)ilename
+for r, d, f in os.walk(tempfile.gettempdir()):
+    for file in f:
+        if file.endswith(suffix): 
+            files.append(os.path.join(r, file)) #rebuild full file name in list created earlier
+
+
+
+
+#Making sensor return a nice message based on OS if nothing found             
+if not files:
+  if sys.platform.startswith(&#x27;win32&#x27;):
+    tanium.results.add(&quot;No Emocheck scan file found - Windows&quot;) 
+  elif sys.platform.startswith(&#x27;linux&#x27;):
+    tanium.results.add(&quot;No Emocheck scan file found - Linux&quot;)
+  elif sys.platform.startswith(&#x27;darwin&#x27;):
+    tanium.results.add(&quot;No Emocheck scan file found - MacOS&quot;)
+else:
+  for f in files:
+      print(f)
+      with open(f,&quot;r&quot;) as fs:
+        line_source = fs.readline()
+        for line_source in fs:
+            if line_source.startswith(&quot;Scan time: &quot;):
+                scan_date = line_source.strip(&quot;Scan time: &quot;)
+                scan_day = scan_date.partition(&quot; &quot;)[0]
+                scan_time= scan_date.partition(&quot; &quot;)[2]
+                scan_time= scan_time.rstrip()
+
+            if line_source.startswith(&quot;Emotet was not detected.&quot;):
+                scan_result = &quot;False&quot;
+                
+                tanium.results.add(scan_day+&quot;|&quot;+scan_time+&quot;|&quot;+scan_result+&quot;|&quot;+&quot;|&quot;)
+
+            if line_source.startswith(&quot;Detected Emotet process.&quot;):
+                    scan_result = &quot;True&quot;
+
+            if line_source.startswith(&quot;     Process Name  : &quot;):
+                scan_process = line_source.partition(&quot;Process Name  : &quot;)[2]
+                scan_process = scan_process.rstrip()
+            if line_source.startswith(&quot;     Image Path    : &quot;):
+                scan_path = line_source.partition(&quot;Image Path    : &quot;)[2]
+                scan_path = scan_path.rstrip()
+
+
+                tanium.results.add(scan_day+&quot;|&quot;+scan_time+&quot;|&quot;+scan_result+&quot;|&quot;+scan_process+&quot;|&quot;+scan_path)
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>6</sensor_type>
+                <os>1</os>
+                <query>#!&#x2F;bin&#x2F;sh
+
+# THIS IS A STUB - NOT INTENDED AS FUNCTIONAL - NA
+# 
+# 
+
+echo &quot;N&#x2F;A on Linux&quot;
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>6</sensor_type>
+                <os>2</os>
+                <query>#!&#x2F;bin&#x2F;sh
+
+# THIS IS A STUB - NOT INTENDED AS FUNCTIONAL - NA
+# 
+# 
+
+echo &quot;N&#x2F;A on Mac&quot;
+</query>
+                <signature></signature>
+            </sensor_query>
+        </queries>
+        <columns>
+            <column>
+                <column_index>0</column_index>
+                <name>Emocheck Scan Date</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>4</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>1</column_index>
+                <name>Emocheck Scan Time</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>4</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>2</column_index>
+                <name>Emocheck Scan Result</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>3</column_index>
+                <name>Process Infected by Emotet</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>4</column_index>
+                <name>Process Location</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>1</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+        </columns>
+        <meta_data/>
+        <content_set>
+            <name>Default</name>
+            <description></description>
+            <reserved_name>default</reserved_name>
+            <meta_data/>
+        </content_set>
+    </sensor>
+</content>

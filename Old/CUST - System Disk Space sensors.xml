@@ -1,0 +1,90 @@
+<!-- Exported using version "7_4_3_1242" on Monday, October 12, 2020 1:53:27 PM -->
+<content>
+    <sensor>
+        <name>CUST - System Disk Space</name>
+        <what_hash>2714975505</what_hash>
+        <category>Miscellaneous</category>
+        <description>Sensor to get the system disk space.
+
+Data returned is unified in integer and can be used to filter.
+
+Using : shutil.disk_usage(path)
+Return disk usage statistics about the given path as a named tuple with the attributes total, used and free, which are the amount of total, used and free space, in bytes. path may be a file or a directory.</description>
+        <result_type>1</result_type>
+        <qseconds>900</qseconds>
+        <ignore_case_flag>1</ignore_case_flag>
+        <delimiter>|</delimiter>
+        <hidden_flag>0</hidden_flag>
+        <queries>
+            <sensor_query>
+                <sensor_type>8</sensor_type>
+                <os>0</os>
+                <query>import shutil
+import tanium
+
+total, used, free = shutil.disk_usage(&quot;&#x2F;&quot;)
+
+tanium.results.add(str((total &#x2F;&#x2F; (2**30)))+&quot;|&quot;+str((used &#x2F;&#x2F; (2**30)))+&quot;|&quot;+str((free &#x2F;&#x2F; (2**30))))
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>8</sensor_type>
+                <os>1</os>
+                <query>import shutil
+import tanium
+
+total, used, free = shutil.disk_usage(&quot;&#x2F;&quot;)
+
+tanium.results.add(str((total &#x2F;&#x2F; (2**30)))+&quot;|&quot;+str((used &#x2F;&#x2F; (2**30)))+&quot;|&quot;+str((free &#x2F;&#x2F; (2**30))))
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>8</sensor_type>
+                <os>2</os>
+                <query>import shutil
+import tanium
+
+total, used, free = shutil.disk_usage(&quot;&#x2F;&quot;)
+
+tanium.results.add(str((total &#x2F;&#x2F; (2**30)))+&quot;|&quot;+str((used &#x2F;&#x2F; (2**30)))+&quot;|&quot;+str((free &#x2F;&#x2F; (2**30))))
+</query>
+                <signature></signature>
+            </sensor_query>
+        </queries>
+        <columns>
+            <column>
+                <column_index>0</column_index>
+                <name>Disk Total (GB)</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>9</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>1</column_index>
+                <name>Disk Used (GB)</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>9</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+            <column>
+                <column_index>2</column_index>
+                <name>Disk Free (GB)</name>
+                <hidden_flag>0</hidden_flag>
+                <result_type>9</result_type>
+                <ignore_case_flag>1</ignore_case_flag>
+                <exclude_from_parse>1</exclude_from_parse>
+            </column>
+        </columns>
+        <meta_data/>
+        <content_set>
+            <name>Default</name>
+            <description></description>
+            <reserved_name>default</reserved_name>
+            <meta_data/>
+        </content_set>
+    </sensor>
+</content>

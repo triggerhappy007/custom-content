@@ -1,0 +1,118 @@
+<!-- Exported using version "7_4_3_1242" on Wednesday, October 14, 2020 7:50:56 AM -->
+<content>
+    <sensor>
+        <name>CUST - System Environment Variables - SAMPLE</name>
+        <what_hash>1238516573</what_hash>
+        <category>Operating System</category>
+        <description>Example of parsing specific variable called SAMPLE
+Please replace in sensor CUST_VAR = &quot;SAMPLE&quot; with variable required.</description>
+        <result_type>1</result_type>
+        <qseconds>900</qseconds>
+        <ignore_case_flag>1</ignore_case_flag>
+        <delimiter>,</delimiter>
+        <hidden_flag>0</hidden_flag>
+        <queries>
+            <sensor_query>
+                <sensor_type>4</sensor_type>
+                <os>0</os>
+                <query>&#x27;========================================
+&#x27; System Environment Variables
+&#x27;========================================
+
+Option Explicit
+
+Const EXPAND_VARS = False
+
+&#x27;-------------------------------------
+&#x27;EI special variable
+&#x27;Please enter in this variable the env variable you want to retrieve
+&#x27;Example = DIm EI_VAR
+&#x27;-------------------------------------
+Dim CUST_VAR
+CUST_VAR = &quot;SAMPLE&quot;
+
+
+Dim wshShell, wshSysEnv, strItem
+Dim SPLITVAR,var_found
+Var_found = 0
+
+Set wshShell = CreateObject( &quot;WScript.Shell&quot; )
+Set wshSysEnv = wshShell.Environment( &quot;SYSTEM&quot; )
+For Each strItem In wshSysEnv
+	Splitvar = split(strItem,&quot;=&quot;)
+	&#x27;WScript.Echo &quot;var name : &quot; &amp; splitvar(0) &amp; &quot; var Value : &quot; &amp; splitvar(1)
+  	if strcomp(splitvar(0),CUST_VAR) = 0 then
+		WScript.Echo splitvar(1)
+		Var_found = 1
+	end if
+Next
+if var_Found = 0 then
+	WScript.Echo &quot;Var Not Found&quot;
+end if
+Set wshSysEnv = Nothing
+Set wshShell = Nothing</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>6</sensor_type>
+                <os>1</os>
+                <query>#!&#x2F;bin&#x2F;sh
+
+# THIS IS A STUB - NOT INTENDED AS FUNCTIONAL - NA
+# 
+# 
+
+echo &quot;N&#x2F;A on Linux&quot;
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>6</sensor_type>
+                <os>2</os>
+                <query>#!&#x2F;bin&#x2F;sh
+
+# THIS IS A STUB - NOT INTENDED AS FUNCTIONAL - NA
+# 
+# 
+
+echo &quot;N&#x2F;A on Mac&quot;
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>6</sensor_type>
+                <os>3</os>
+                <query>#!&#x2F;bin&#x2F;sh
+
+# THIS IS A STUB - NOT INTENDED AS FUNCTIONAL - NA
+# 
+# 
+
+echo &quot;N&#x2F;A on Solaris&quot;
+</query>
+                <signature></signature>
+            </sensor_query>
+            <sensor_query>
+                <sensor_type>6</sensor_type>
+                <os>4</os>
+                <query>#!&#x2F;bin&#x2F;sh
+
+# THIS IS A STUB - NOT INTENDED AS FUNCTIONAL - NA
+# 
+# 
+
+echo &quot;N&#x2F;A on AIX&quot;
+</query>
+                <signature></signature>
+            </sensor_query>
+        </queries>
+        <columns/>
+        <meta_data/>
+        <content_set>
+            <name>Default</name>
+            <description></description>
+            <reserved_name>default</reserved_name>
+            <meta_data/>
+        </content_set>
+    </sensor>
+</content>
