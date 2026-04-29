@@ -1,0 +1,41 @@
+[
+  {
+    "name": "CUST - My Custom Sensor",
+    "category": "Miscellaneous",
+    "description": "Description of what this sensor collects.",
+    "result_type": 1,
+    "query_interval_seconds": 900,
+    "ignore_case_flag": 1,
+    "delimiter": "|",
+    "hidden_flag": 0,
+    "content_set": {
+      "name": "Default"
+    },
+    "queries": [
+      {
+        "platform": "Windows",
+        "script_type": "Python",
+        "script": "import tanium\ntanium.results.add('Hello from Windows')\n"
+      },
+      {
+        "platform": "Linux",
+        "script_type": "Shell",
+        "script": "#!/bin/sh\necho 'N/A on Linux'\n"
+      },
+      {
+        "platform": "macOS",
+        "script_type": "Shell",
+        "script": "#!/bin/sh\necho 'N/A on macOS'\n"
+      }
+    ],
+    "columns": [
+      {
+        "name": "Result",
+        "index": 0,
+        "hidden_flag": 0,
+        "result_type": 1,
+        "ignore_case_flag": 1
+      }
+    ]
+  }
+]

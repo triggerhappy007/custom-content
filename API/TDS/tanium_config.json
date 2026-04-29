@@ -1,0 +1,10 @@
+{
+  "host": "https://your-tanium-server.example.com",
+  "credentials": {
+    "username": "admin",
+    "password": "your_password"
+  },
+  "verify_ssl": true,
+  "timeout_seconds": 30,
+  "content_set": "Default"
+}
