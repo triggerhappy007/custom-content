@@ -2,5 +2,5 @@
 # Replace the values below with your actual URL and API token.
 # Lines starting with '#' are ignored.
 
-url=https://demo-api.cloud.tanium.com/plugin/products/gateway/graphql
-token=token-e848e65d6af22267e241588b5e58ccfddc91d202623ce2cc2ed09355c8
+url=https://<customername>-api.cloud.tanium.com/plugin/products/gateway/graphql
+token=token-<your-api-token-here>
